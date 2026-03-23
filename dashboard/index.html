@@ -35,7 +35,7 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 .body{display:flex;flex:1;overflow:hidden}
 
 /* SOL PANEL */
-.left{width:340px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.left{width:260px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
 .lsec{padding:10px 13px;border-bottom:1px solid var(--border)}
 .lsec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
 
@@ -87,7 +87,7 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 .right{flex:1;display:flex;overflow:hidden}
 
 /* Sağ sol: TF seçici + tablolar */
-.main-col{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
+.main-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
 /* TF + Sinyal bar */
 .tf-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
@@ -107,8 +107,8 @@ select{border:1px solid var(--border);border-radius:5px;background:var(--s2);col
 .tbl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .tbl-body{overflow-y:auto;flex:1}
 
-/* Optimizer sağ kolon */
-.opt-col{width:420px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
+/* Optimizer sağ kolon — sol panele taşındı */
+.opt-col{width:340px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
 .opt-results-area{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px}
 .sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 
@@ -248,6 +248,33 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       <button id="btn-opt">⚡ Optimize Et</button>
     </div>
 
+    <!-- Optimizer sonuçları -->
+    <div class="lsec" style="flex:2;display:flex;flex-direction:column;overflow:hidden;padding:8px 10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <div class="lsec-title" style="margin:0">Sonuçlar <span id="opt-count" style="font-weight:400"></span></div>
+        <span style="font-size:10px;color:var(--muted)">tıkla → aktif et</span>
+      </div>
+      <div style="overflow:auto;flex:1">
+        <table>
+          <thead><tr>
+            <th>H</th><th>Y</th><th>W%</th>
+            <th style="color:var(--buy)">W</th>
+            <th style="color:var(--sell)">L</th>
+            <th>K/Z</th><th>PF</th><th>DD</th>
+          </tr></thead>
+          <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aktif stratejiler -->
+    <div class="lsec" style="flex-shrink:0;max-height:220px;overflow-y:auto">
+      <div class="lsec-title">Aktif Stratejiler <span id="strat-count" style="font-weight:400"></span></div>
+      <div class="strat-list" id="strat-list">
+        <div class="empty" style="font-size:12px">Henüz strateji eklenmedi.</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- SAĞ ALAN -->
@@ -295,36 +322,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       </div>
     </div>
 
-    <!-- Sağ: optimizer sonuçları + aktif stratejiler -->
-    <div class="opt-col">
-      <div class="opt-results-area">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400;color:var(--muted)"></span></div>
-          <span style="font-size:11px;color:var(--muted)">tıkla → aktif et</span>
-        </div>
-        <div style="overflow:auto;flex:1">
-          <table>
-            <thead><tr>
-              <th>Hızlı</th><th>Yavaş</th><th>W%</th>
-              <th style="color:var(--buy)">W</th>
-              <th style="color:var(--sell)">L</th>
-              <th>K/Z</th><th>PF</th><th>MaxDD</th>
-            </tr></thead>
-            <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="strat-area">
-        <div class="strat-area-hdr">Aktif Stratejiler <span id="strat-count" style="font-weight:400;color:var(--muted)"></span></div>
-        <div class="strat-list" id="strat-list">
-          <div class="empty" style="font-size:13px">Henüz strateji eklenmedi.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
+  </div><!-- /right -->
+</div><!-- /body -->
 
 <script>
 let API='',activeSym='',allTicks={},barCache={},positions=[],history=[],activeStrats=[];
