@@ -557,8 +557,9 @@ function processData(d) {
 
 async function fetchBars(symbol) {
   if (!API_URL) return;
+  const tf = document.getElementById('tf-select').value;
   try {
-    const r = await fetch(API_URL + '/bars/' + symbol + '?limit=300');
+    const r = await fetch(API_URL + '/bars/' + symbol + '?limit=300&tf=' + tf);
     if (!r.ok) return;
     const d = await r.json();
     if (d.bars && d.bars.length) {
@@ -568,6 +569,14 @@ async function fetchBars(symbol) {
     }
   } catch {}
 }
+
+// TF değişince grafiği yenile
+document.getElementById('tf-select').addEventListener('change', () => {
+  if (activeSymbol) {
+    delete barCache[activeSymbol]; // cache'i temizle
+    fetchBars(activeSymbol);
+  }
+});
 
 // ══════════════════════════════════════════════
 //  SYMBOL TABS
@@ -1101,8 +1110,13 @@ function renderPositions(pos) {
 
 function renderHistory(hist) {
   const tbody=document.getElementById('hist-tbody');
-  if(!hist.length){tbody.innerHTML='<tr><td colspan="7" class="empty">İşlem geçmişi yok</td></tr>';return;}
-  tbody.innerHTML=hist.slice(0,40).map(t=>{
+  // Sadece gerçek kapalı işlemler: profit != 0 veya açıkça WIN/LOSS
+  const closed = hist
+    .filter(t => t.profit !== 0 || t.result === 'LOSS')
+    .sort((a,b) => b.time - a.time) // en yeni üstte
+    .slice(0, 50);
+  if(!closed.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Kapalı işlem yok</td></tr>';return;}
+  tbody.innerHTML=closed.map(t=>{
     const pc=t.profit>=0?'sv-buy':'sv-sell';
     const sign=t.profit>=0?'+':'';
     const dt=new Date(t.time*1000).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});

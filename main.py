@@ -180,12 +180,15 @@ def get_data():
         }
 
 @app.get("/bars/{symbol}")
-def get_bars(symbol: str, limit: int = 500):
+def get_bars(symbol: str, limit: int = 500, tf: str = ""):
     sym = symbol.upper()
+    key = sym + ("_" + tf if tf else "")
     with lock:
-        if sym not in bar_data:
+        # tf varsa o anahtara bak, yoksa düz sembol
+        data = bar_data.get(key) or bar_data.get(sym)
+        if not data:
             return {"symbol": sym, "bars": [], "count": 0}
-        bars = list(bar_data[sym])
+        bars = list(data)
         return {
             "symbol": sym,
             "bars":   bars[-limit:],
