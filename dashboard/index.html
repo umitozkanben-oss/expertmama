@@ -4,43 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ExpertMAMA · Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f1f5f9;--s1:#fff;--s2:#f8fafc;--border:#e2e8f0;--accent:#2563eb;--buy:#16a34a;--sell:#dc2626;--warn:#d97706;--text:#0f172a;--muted:#64748b;--light:#94a3b8}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:17px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+:root{
+  --bg:#f1f5f9;--s1:#fff;--s2:#f8fafc;--border:#e2e8f0;
+  --accent:#2563eb;--buy:#16a34a;--sell:#dc2626;--warn:#d97706;
+  --text:#0f172a;--muted:#64748b;--light:#94a3b8;
+  --mono:'IBM Plex Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
 
 /* HEADER */
-header{display:flex;align-items:center;padding:8px 16px;background:#fff;border-bottom:1px solid var(--border);gap:10px;flex-shrink:0}
-.logo{font-weight:700;font-size:17px;color:var(--accent);white-space:nowrap}.logo span{color:var(--light);font-weight:400}
+header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-bottom:1px solid var(--border);gap:10px;flex-shrink:0}
+.logo{font-weight:700;font-size:15px;color:var(--accent);white-space:nowrap}.logo span{color:var(--light);font-weight:400}
 .sym-bar{display:flex;gap:4px;flex-wrap:wrap;flex:1;justify-content:center}
-.sym-tab{padding:3px 10px;border-radius:10px;border:1px solid var(--border);background:var(--s2);font-size:13px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.sym-tab{padding:3px 11px;border-radius:10px;border:1px solid var(--border);background:var(--s2);font-size:12px;cursor:pointer;color:var(--muted);white-space:nowrap;transition:all .15s}
 .sym-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .hdr-r{display:flex;align-items:center;gap:8px;white-space:nowrap}
-#vps-url{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;padding:4px 9px;width:190px;outline:none}
-#btn-conn{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:4px 12px;font-size:13px;font-weight:600;cursor:pointer}
+#vps-url{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:var(--mono);font-size:12px;padding:4px 10px;width:190px;outline:none}
+#btn-conn{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:4px 13px;font-size:12px;font-weight:600;cursor:pointer}
 .dot{width:7px;height:7px;border-radius:50%;background:#cbd5e1;flex-shrink:0}.dot.on{background:var(--buy);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.clock{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
-
-/* AUTO MODE */
-.auto-btn{padding:4px 12px;border-radius:10px;border:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--muted);transition:all .2s}
+.clock{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.auto-btn{padding:4px 13px;border-radius:10px;border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;background:#fff;color:var(--muted);transition:all .2s}
 .auto-btn.on{background:#16a34a;border-color:#16a34a;color:#fff}
 
-/* BODY */
+/* LAYOUT */
 .body{display:flex;flex:1;overflow:hidden}
 
 /* SOL PANEL */
 .left{width:340px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
 .lsec{padding:10px 13px;border-bottom:1px solid var(--border)}
-.lsec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px}
+.lsec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
 
-/* Fiyat */
-.price-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px}
-.pitem{background:var(--s2);border-radius:6px;padding:6px 8px}
+/* Fiyat kartları */
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.pitem{background:var(--s2);border-radius:6px;padding:7px 9px}
 .pitem .lbl{font-size:11px;color:var(--muted);margin-bottom:2px}
-.pitem .val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600}
+.pitem .val{font-family:var(--mono);font-size:15px;font-weight:500}
 .pitem.buy{background:#f0fdf4}.pitem.buy .lbl{color:#15803d}.pitem.buy .val{color:#15803d}
 .pitem.sell{background:#fff1f2}.pitem.sell .lbl{color:#dc2626}.pitem.sell .val{color:#dc2626}
 .pitem.cross-buy{background:#bbf7d0;animation:gb .9s ease-in-out infinite alternate}
@@ -50,142 +53,108 @@ header{display:flex;align-items:center;padding:8px 16px;background:#fff;border-b
 
 /* Hesap */
 .acct-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
-.acct-row .lbl{font-size:13px;color:var(--muted)}
-.acct-row .val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600}
+.acct-row .lbl{font-size:12px;color:var(--muted)}
+.acct-row .val{font-family:var(--mono);font-size:13px;font-weight:500}
 
-/* Filtre */
-.filter-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
-.fpill{padding:3px 8px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted)}
+/* Filtre + stats */
+.filter-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.fpill{padding:3px 8px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:11px;cursor:pointer;color:var(--muted)}
 .fpill.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .date-range{display:none;flex-direction:column;gap:4px;margin-bottom:6px}
-.date-range input{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-size:12px;padding:3px 6px;outline:none;width:100%}
-
-/* Stats */
+.date-range input{border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-size:11px;padding:3px 6px;outline:none;width:100%}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .sitem{background:var(--s2);border-radius:6px;padding:8px;text-align:center}
-.sitem .sv{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;line-height:1;margin-bottom:2px}
-.sitem .sl{font-size:12px;color:var(--muted)}
+.sitem .sv{font-family:var(--mono);font-size:22px;font-weight:500;line-height:1;margin-bottom:2px}
+.sitem .sl{font-size:11px;color:var(--muted)}
 .sv-buy{color:var(--buy)}.sv-sell{color:var(--sell)}.sv-acc{color:var(--accent)}
 .wl-wrap{margin-top:7px}
-.wl-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:3px}
+.wl-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px}
 .wl-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
 .wl-fill{height:100%;background:var(--buy);border-radius:2px;transition:width .5s}
 
-/* Optimizer sol */
-.opt-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:6px}
-.of label{font-size:12px;color:var(--muted);display:block;margin-bottom:2px}
-.of input,.of select{width:100%;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;padding:3px 5px;outline:none}
-.opt-note{font-size:12px;color:var(--muted);margin-bottom:5px}
-.best-banner{font-size:12px;padding:5px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;color:#15803d;font-weight:600;display:none;margin-bottom:5px;line-height:1.4}
-#btn-opt{width:100%;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-weight:600;font-size:13px;cursor:pointer}
+/* Optimizer sol form */
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}
+.of label{font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
+.of input,.of select{width:100%;border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-family:var(--mono);font-size:13px;padding:4px 6px;outline:none}
+.opt-note{font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.4}
+.best-banner{font-size:11px;padding:5px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;color:#15803d;font-weight:600;display:none;margin-bottom:5px;line-height:1.5}
+#btn-opt{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-weight:600;font-size:13px;cursor:pointer}
 #btn-opt:disabled{opacity:.4;cursor:not-allowed}
-.prog{height:2px;background:var(--border);border-radius:1px;display:none;margin-top:4px}
-.prog-f{height:100%;background:var(--accent);border-radius:1px;transition:width .2s}
+.prog{height:3px;background:var(--border);border-radius:2px;display:none;margin-top:4px}
+.prog-f{height:100%;background:var(--accent);border-radius:2px;transition:width .2s}
 
-/* Aktif Stratejiler (sağ kolona taşındı) */
-.strat-list{display:flex;flex-direction:column;gap:5px}
-.strat-item{background:var(--s2);border-radius:6px;padding:7px 9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:5px}
-.strat-item.inactive{opacity:.5}
-.strat-info{flex:1;min-width:0}
-.strat-sym{font-size:13px;font-weight:600;color:var(--text)}
-.strat-detail{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace}
-.strat-actions{display:flex;gap:4px}
-.sbtn{padding:2px 7px;border-radius:4px;border:1px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted)}
-.sbtn.del{color:var(--sell);border-color:#fca5a5}
-.sbtn.tog{color:var(--buy);border-color:#86efac}
+/* SAĞ ALAN */
+.right{flex:1;display:flex;overflow:hidden}
 
-/* SAĞ */
-.right{flex:1;display:flex;gap:0;overflow:hidden}
-.chart-col{width:480px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
-.opt-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
+/* Sağ sol: TF seçici + tablolar */
+.main-col{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
 
-/* Grafik */
-.chart-area{flex:1;padding:12px;display:flex;flex-direction:column;min-height:0}
-.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px}
-.chart-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
-.chart-controls{display:flex;align-items:center;gap:6px}
-.sig-badge{font-size:13px;font-weight:600;padding:3px 10px;border-radius:9px;background:var(--s2);color:var(--muted);white-space:nowrap}
+/* TF + Sinyal bar */
+.tf-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
+.tf-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.sig-badge{font-size:13px;font-weight:600;padding:4px 12px;border-radius:10px;background:var(--s2);color:var(--muted);white-space:nowrap}
 .sig-badge.buy{background:#dcfce7;color:#15803d}
 .sig-badge.sell{background:#fee2e2;color:#dc2626}
 .sig-badge.cross-buy{background:#bbf7d0;color:#15803d;animation:gb .9s ease-in-out infinite alternate}
 .sig-badge.cross-sell{background:#fecaca;color:#dc2626;animation:gr .9s ease-in-out infinite alternate}
-select{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-size:13px;padding:3px 7px;outline:none}
-canvas{display:block;width:100%}
+select{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-size:13px;padding:4px 8px;outline:none}
 
-/* Sağ kolon: optimizer + stratejiler */
-.opt-results-area{display:flex;flex-direction:column;overflow:hidden;padding:12px;flex:1}
-.sec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
-.tbl-wrap{overflow:auto;flex:1}
-table{width:100%;border-collapse:collapse;font-size:13px}
-thead th{position:sticky;top:0;background:var(--s2);padding:5px 7px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)}
+/* Alt tablolar */
+.tables-area{flex:1;display:grid;grid-template-rows:1fr 1fr;overflow:hidden}
+.tbl-panel{display:flex;flex-direction:column;overflow:hidden;border-bottom:1px solid var(--border)}
+.tbl-panel:last-child{border-bottom:none}
+.tbl-hdr{padding:7px 14px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.tbl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.tbl-body{overflow-y:auto;flex:1}
+
+/* Optimizer sağ kolon */
+.opt-col{width:420px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden}
+.opt-results-area{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+
+/* Aktif stratejiler */
+.strat-area{padding:0 12px 12px;flex-shrink:0;max-height:240px;overflow-y:auto;border-top:1px solid var(--border)}
+.strat-area-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 0 6px}
+.strat-list{display:flex;flex-direction:column;gap:5px}
+.strat-item{background:var(--s2);border-radius:6px;padding:7px 10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:5px}
+.strat-item.inactive{opacity:.5}
+.strat-info{flex:1;min-width:0}
+.strat-sym{font-size:13px;font-weight:600}
+.strat-detail{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.strat-actions{display:flex;gap:4px}
+.sbtn{padding:2px 8px;border-radius:4px;border:1px solid var(--border);background:#fff;font-size:11px;cursor:pointer;color:var(--muted)}
+.sbtn.del{color:var(--sell);border-color:#fca5a5}
+.sbtn.tog{color:var(--buy);border-color:#86efac}
+
+/* Tablolar */
+table{width:100%;border-collapse:collapse}
+thead th{position:sticky;top:0;background:var(--s2);padding:6px 9px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
 tbody tr{border-bottom:1px solid #f1f5f9;cursor:pointer}
 tbody tr:hover{background:#f8fafc}
-tbody td{padding:6px 7px;font-family:'JetBrains Mono',monospace}
+tbody td{padding:7px 9px;font-family:var(--mono);font-size:13px}
 tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
 .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:12px;font-weight:600}
 .b-buy{background:#dcfce7;color:#15803d}.b-sell{background:#fee2e2;color:#dc2626}
 .b-win{background:#dcfce7;color:#15803d}.b-loss{background:#fee2e2;color:#dc2626}
 .pnl-p{color:var(--buy);font-weight:600}.pnl-n{color:var(--sell);font-weight:600}
-.empty{text-align:center;padding:14px;color:var(--light);font-size:13px}
-
-/* Alt tablolar */
-.bottom-area{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);flex-shrink:0;max-height:200px}
-.btbl{overflow:hidden;display:flex;flex-direction:column}
-.btbl:first-child{border-right:1px solid var(--border)}
-.btbl-hdr{padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.btbl-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.btbl-body{overflow-y:auto;flex:1}
-.btbl table{font-size:13px}
-
-/* Stratejiler sağ kolonda */
-.strat-area{padding:0 12px 12px;flex-shrink:0;border-top:1px solid var(--border)}
-.strat-area-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:8px 0 6px}
+.empty{text-align:center;padding:16px;color:var(--light);font-size:13px;line-height:1.6}
 
 /* NO CONN */
 #no-conn{display:flex;position:fixed;inset:0;z-index:300;background:rgba(241,245,249,.97);flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #no-conn h2{font-size:18px;font-weight:700;color:var(--accent)}
 #no-conn p{font-size:14px;color:var(--muted);text-align:center;max-width:320px;line-height:1.7}
 .nc-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px 28px;display:flex;flex-direction:column;gap:11px;min-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.nc-lbl{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.nc-lbl{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .nc-row{display:flex;gap:7px}
-.nc-row input{flex:1;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;padding:7px 10px;outline:none}
+.nc-row input{flex:1;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:var(--mono);font-size:14px;padding:7px 10px;outline:none}
 .nc-row input:focus{border-color:var(--accent)}
 .nc-row button{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer}
-tbody tr{border-bottom:1px solid #f1f5f9;cursor:pointer}
-tbody tr:hover{background:#f8fafc}
-tbody td{padding:4px 5px;font-family:'JetBrains Mono',monospace}
-tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
-.badge{display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600}
-.b-buy{background:#dcfce7;color:#15803d}.b-sell{background:#fee2e2;color:#dc2626}
-.b-win{background:#dcfce7;color:#15803d}.b-loss{background:#fee2e2;color:#dc2626}
-.pnl-p{color:var(--buy);font-weight:600}.pnl-n{color:var(--sell);font-weight:600}
-.empty{text-align:center;padding:12px;color:var(--light);font-size:10px}
-
-/* Alt tablolar */
-.bottom-area{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);flex-shrink:0;max-height:200px}
-.btbl{overflow:hidden;display:flex;flex-direction:column}
-.btbl:first-child{border-right:1px solid var(--border)}
-.btbl-hdr{padding:5px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.btbl-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.btbl-body{overflow-y:auto;flex:1}
-.btbl table{font-size:10px}
-
-/* NO CONN */
-#no-conn{display:flex;position:fixed;inset:0;z-index:300;background:rgba(241,245,249,.97);flex-direction:column;align-items:center;justify-content:center;gap:12px}
-#no-conn h2{font-size:15px;font-weight:700;color:var(--accent)}
-#no-conn p{font-size:11px;color:var(--muted);text-align:center;max-width:300px;line-height:1.7}
-.nc-box{background:#fff;border:1px solid var(--border);border-radius:9px;padding:18px 24px;display:flex;flex-direction:column;gap:9px;min-width:280px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.nc-lbl{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.nc-row{display:flex;gap:6px}
-.nc-row input{flex:1;border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 8px;outline:none}
-.nc-row input:focus{border-color:var(--accent)}
-.nc-row button{background:var(--accent);color:#fff;border:none;border-radius:4px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
 
 <div id="no-conn">
-  <div style="font-size:30px">📡</div>
+  <div style="font-size:32px">📡</div>
   <h2>ExpertMAMA Dashboard</h2>
   <p>VPS adresini gir ve bağlan.</p>
   <div class="nc-box">
@@ -214,7 +183,6 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
   <!-- SOL PANEL -->
   <div class="left">
 
-    <!-- Fiyat -->
     <div class="lsec">
       <div class="lsec-title">Fiyat — <span id="p-sym-title">—</span></div>
       <div class="price-grid">
@@ -225,7 +193,6 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       </div>
     </div>
 
-    <!-- Hesap -->
     <div class="lsec">
       <div class="lsec-title">Hesap</div>
       <div class="acct-row"><span class="lbl">Bakiye</span><span class="val" id="p-bal">—</span></div>
@@ -233,9 +200,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       <div class="acct-row"><span class="lbl">Serbest Marjin</span><span class="val" id="p-fm">—</span></div>
     </div>
 
-    <!-- İstatistik + Filtre -->
     <div class="lsec">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
         <div class="lsec-title" style="margin:0">İstatistik</div>
         <div class="filter-pills" style="margin:0">
           <div class="fpill active" data-f="today">Bugün</div>
@@ -261,69 +227,67 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       </div>
     </div>
 
-    <!-- MA Optimizer -->
-    <div class="lsec">
+    <div class="lsec" style="flex:1">
       <div class="lsec-title">MA Optimizer</div>
       <div class="opt-grid">
         <div class="of"><label>Hızlı Min</label><input type="number" id="f-min" value="5"></div>
         <div class="of"><label>Hızlı Max</label><input type="number" id="f-max" value="30"></div>
         <div class="of"><label>Yavaş Min</label><input type="number" id="s-min" value="20"></div>
         <div class="of"><label>Yavaş Max</label><input type="number" id="s-max" value="100"></div>
-        <div class="of" style="grid-column:span 2"><label>MA Türü</label>
+        <div class="of"><label>MA Türü</label>
           <select id="ma-type"><option value="SMA">SMA</option><option value="EMA" selected>EMA</option><option value="WMA">WMA</option></select>
         </div>
         <div class="of"><label>Lot</label><input type="number" id="o-lot" value="0.05" step="0.01"></div>
+        <div class="of"><label>SL (pip)</label><input type="number" id="o-sl" value="" placeholder="0=kapalı"></div>
+        <div class="of"><label>TP (pip)</label><input type="number" id="o-tp" value="" placeholder="0=kapalı"></div>
         <div class="of"><label>ATR Çarpan</label><input type="number" id="o-atr" value="1.5" step="0.1"></div>
-        <div class="of"><label>SL (pip)</label><input type="number" id="o-sl" value="50"></div>
-        <div class="of"><label>TP (pip)</label><input type="number" id="o-tp" value="100"></div>
       </div>
-      <div class="opt-note" id="opt-note">TF seç → Optimize Et</div>
+      <div class="opt-note" id="opt-note">TF seç → Optimize Et<br><span style="color:var(--light)">Min: 20 işlem · W%≥45 · PF≥1.5</span></div>
       <div class="best-banner" id="best-banner"></div>
       <div class="prog" id="prog"><div class="prog-f" id="prog-f" style="width:0%"></div></div>
       <button id="btn-opt">⚡ Optimize Et</button>
     </div>
 
-  </div><!-- /left -->
+  </div>
 
   <!-- SAĞ ALAN -->
   <div class="right">
 
-    <!-- Grafik kolonu -->
-    <div class="chart-col">
-      <div class="chart-area">
-        <div class="chart-hdr">
-          <div class="chart-title" id="chart-title">Fiyat Grafiği</div>
-          <div class="chart-controls">
-            <div class="sig-badge" id="chart-sig">—</div>
-            <select id="tf-sel">
-              <option value="M5">M5</option>
-              <option value="M15" selected>M15</option>
-              <option value="H1">H1</option>
-              <option value="H4">H4</option>
-            </select>
-          </div>
-        </div>
-        <canvas id="main-canvas" style="flex:1;min-height:0"></canvas>
+    <!-- Orta: TF seçici + tablolar -->
+    <div class="main-col">
+      <div class="tf-bar">
+        <span class="tf-label">Zaman Dilimi:</span>
+        <select id="tf-sel">
+          <option value="M5">M5</option>
+          <option value="M15" selected>M15</option>
+          <option value="H1">H1</option>
+          <option value="H4">H4</option>
+        </select>
+        <div class="sig-badge" id="chart-sig">—</div>
+        <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
       </div>
 
-      <!-- Alt tablolar -->
-      <div class="bottom-area">
-        <div class="btbl">
-          <div class="btbl-hdr"><div class="btbl-title">Açık Pozisyonlar</div></div>
-          <div class="btbl-body">
+      <div class="tables-area">
+        <!-- Açık pozisyonlar -->
+        <div class="tbl-panel">
+          <div class="tbl-hdr">
+            <div class="tbl-title">Açık Pozisyonlar</div>
+          </div>
+          <div class="tbl-body">
             <table>
-              <thead><tr><th>Sembol</th><th>Yön</th><th>Lot</th><th>Açılış</th><th>Güncel</th><th>SL</th><th>K/Z</th></tr></thead>
-              <tbody id="pos-body"><tr><td colspan="7" class="empty">Açık pozisyon yok</td></tr></tbody>
+              <thead><tr><th>Sembol</th><th>Yön</th><th>Lot</th><th>Açılış</th><th>Güncel</th><th>SL</th><th>TP</th><th>K/Z</th></tr></thead>
+              <tbody id="pos-body"><tr><td colspan="8" class="empty">Açık pozisyon yok</td></tr></tbody>
             </table>
           </div>
         </div>
-        <div class="btbl">
-          <div class="btbl-hdr">
-            <div class="btbl-title" id="hist-title">Bugünün İşlemleri</div>
+        <!-- İşlem geçmişi -->
+        <div class="tbl-panel">
+          <div class="tbl-hdr">
+            <div class="tbl-title" id="hist-title">Bugünün İşlemleri</div>
           </div>
-          <div class="btbl-body">
+          <div class="tbl-body">
             <table>
-              <thead><tr><th>Ticket</th><th>Sembol</th><th>Yön</th><th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Saat</th></tr></thead>
+              <thead><tr><th>Ticket</th><th>Sembol</th><th>Yön</th><th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Tarih</th></tr></thead>
               <tbody id="hist-body"><tr><td colspan="7" class="empty">İşlem yok</td></tr></tbody>
             </table>
           </div>
@@ -331,35 +295,30 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       </div>
     </div>
 
-    <!-- Sağ kolon: optimizer sonuçları + aktif stratejiler -->
+    <!-- Sağ: optimizer sonuçları + aktif stratejiler -->
     <div class="opt-col">
       <div class="opt-results-area">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400"></span></div>
-          <div style="font-size:12px;color:var(--muted)">Satıra tıkla → Aktif Et</div>
+          <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400;color:var(--muted)"></span></div>
+          <span style="font-size:11px;color:var(--muted)">tıkla → aktif et</span>
         </div>
-        <div class="tbl-wrap" style="flex:1">
+        <div style="overflow:auto;flex:1">
           <table>
-            <thead>
-              <tr>
-                <th>Hızlı</th><th>Yavaş</th><th>W%</th>
-                <th style="color:var(--buy)">W</th>
-                <th style="color:var(--sell)">L</th>
-                <th>K/Z ($)</th><th>PF</th><th>MaxDD</th>
-              </tr>
-            </thead>
-            <tbody id="opt-body">
-              <tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr>
-            </tbody>
+            <thead><tr>
+              <th>Hızlı</th><th>Yavaş</th><th>W%</th>
+              <th style="color:var(--buy)">W</th>
+              <th style="color:var(--sell)">L</th>
+              <th>K/Z</th><th>PF</th><th>MaxDD</th>
+            </tr></thead>
+            <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- Aktif Stratejiler -->
       <div class="strat-area">
-        <div class="strat-area-title">Aktif Stratejiler <span id="strat-count" style="font-weight:400;color:var(--muted)"></span></div>
+        <div class="strat-area-hdr">Aktif Stratejiler <span id="strat-count" style="font-weight:400;color:var(--muted)"></span></div>
         <div class="strat-list" id="strat-list">
-          <div class="empty" style="font-size:13px">Henüz strateji eklenmedi. Optimizer'dan satıra tıkla.</div>
+          <div class="empty" style="font-size:13px">Henüz strateji eklenmedi.</div>
         </div>
       </div>
     </div>
@@ -388,7 +347,6 @@ document.getElementById('btn-conn-ov').onclick=connect;
 ['vps-url','vps-ov'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>e.key==='Enter'&&connect()));
 function setConn(v){document.getElementById('conn-dot').className='dot'+(v?' on':'');}
 
-// Auto mode
 document.getElementById('auto-btn').onclick=async()=>{
   autoMode=!autoMode;
   await fetch(API+'/automode',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled:autoMode})});
@@ -428,16 +386,16 @@ async function fetchBars(sym){
     const d=await r.json();
     if(d.bars?.length){
       barCache[sym+'_'+tf]=d.bars;
-      drawMain(d.bars);updateSig(d.bars);
+      updateSig(d.bars);
       const lot=document.getElementById('o-lot').value;
-      document.getElementById('opt-note').textContent=`${tf} · ${d.bars.length} bar · ${lot} lot`;
+      document.getElementById('opt-note').innerHTML=`${sym} · ${tf} · ${d.bars.length} bar · ${lot} lot<br><span style="color:var(--light)">Min: 20 işlem · W%≥45 · PF≥1.5</span>`;
+      document.getElementById('bar-count').textContent=`${d.bars.length} bar`;
     }
   }catch{}
 }
 
 document.getElementById('tf-sel').addEventListener('change',()=>{if(activeSym)fetchBars(activeSym);});
 
-// ── SYMBOL TABS ──
 function renderSymTabs(syms){
   const bar=document.getElementById('sym-bar');
   const ex=new Set([...bar.querySelectorAll('.sym-tab')].map(t=>t.dataset.s));
@@ -448,27 +406,22 @@ function renderSymTabs(syms){
       activeSym=s;document.querySelectorAll('.sym-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
       if(allTicks[s])renderTick(allTicks[s]);
       const tf=document.getElementById('tf-sel').value;
-      if(barCache[s+'_'+tf]){drawMain(barCache[s+'_'+tf]);updateSig(barCache[s+'_'+tf]);}else fetchBars(s);
-      document.getElementById('chart-title').textContent=s+' · Fiyat Grafiği';
+      if(barCache[s+'_'+tf])updateSig(barCache[s+'_'+tf]);else fetchBars(s);
+      document.getElementById('p-sym-title').textContent=s;
     };bar.appendChild(t);
   });
   document.querySelectorAll('.sym-tab').forEach(t=>t.classList.toggle('active',t.dataset.s===activeSym));
 }
 
-// ── TICK ──
 function renderTick(t){
   if(!t)return;
   set('p-sym-title',t.symbol);
   set('p-bid',f5(t.bid));set('p-ask',f5(t.ask));
-  // Tick value'dan pip değeri — doğru hesap
-  const tv=t.tick_value||0;
-  const pipSize=t.spread?((t.bid-Math.floor(t.bid/0.01)*0.01)<0.001?0.00001:0.001):0.00001;
   set('p-spread',f1(t.spread/10)+' pip');
   set('p-bal',f2(t.balance)+' '+(t.currency||''));
   set('p-eq',f2(t.equity));set('p-fm',f2(t.free_margin));
 }
 
-// ── SİNYAL ──
 function updateSig(bars){
   const sig=getSig(bars,bestMA.fast,bestMA.slow,bestMA.type);
   set('p-sig',sig.label);
@@ -492,7 +445,6 @@ function getSig(bars,fP,sP,type){
   return{label:'NEUTRAL',bull:false,bear:false,crossBuy:false,crossSell:false};
 }
 
-// ── DATE FILTER ──
 document.querySelectorAll('.fpill').forEach(btn=>{
   btn.onclick=()=>{
     document.querySelectorAll('.fpill').forEach(b=>b.classList.remove('active'));
@@ -523,7 +475,6 @@ function filterHistory(hist){
   });
 }
 
-// ── STATS ──
 function renderStats(){
   const filtered=filterHistory(history);
   let wins=0,losses=0,pnl=0;
@@ -538,21 +489,19 @@ function renderStats(){
   set('hist-title',labels[activeFilter]||'İşlemler');
 }
 
-// ── POSITIONS ──
 function renderPositions(pos){
   const tb=document.getElementById('pos-body');
   const list=Array.isArray(pos)?pos:Object.values(pos);
-  if(!list.length){tb.innerHTML='<tr><td colspan="7" class="empty">Açık pozisyon yok</td></tr>';return;}
+  if(!list.length){tb.innerHTML='<tr><td colspan="8" class="empty">Açık pozisyon yok</td></tr>';return;}
   tb.innerHTML=list.map(p=>`<tr>
     <td>${p.symbol}</td>
     <td><span class="badge b-${p.direction.toLowerCase()}">${p.direction}</span></td>
     <td>${f2(p.volume)}</td><td>${f5(p.open_price)}</td><td>${f5(p.current_price)}</td>
-    <td>${p.sl?f5(p.sl):'—'}</td>
+    <td>${p.sl?f5(p.sl):'—'}</td><td>${p.tp?f5(p.tp):'—'}</td>
     <td class="${p.profit>=0?'pnl-p':'pnl-n'}">${p.profit>=0?'+':''}${f2(p.profit)}</td>
   </tr>`).join('');
 }
 
-// ── HISTORY ──
 function renderHistory(hist){
   const tb=document.getElementById('hist-body');
   const filtered=filterHistory(hist).sort((a,b)=>b.time-a.time);
@@ -565,43 +514,31 @@ function renderHistory(hist){
       <td>${f2(t.volume)}</td>
       <td class="${t.profit>=0?'pnl-p':'pnl-n'}">${t.profit>=0?'+':''}${f2(t.profit)}</td>
       <td><span class="badge b-${t.result.toLowerCase()}">${t.result}</span></td>
-      <td style="color:var(--light);font-size:9px">${dt}</td>
+      <td style="color:var(--light);font-size:12px">${dt}</td>
     </tr>`;
   }).join('');
 }
 
-// ── AKTİF STRATEJİLER ──
 function renderStrategies(){
   const list=document.getElementById('strat-list');
   set('strat-count','('+activeStrats.length+')');
-  if(!activeStrats.length){
-    list.innerHTML='<div class="empty" style="font-size:10px">Henüz strateji eklenmedi.<br>Optimizer\'dan satıra tıkla → "Aktif Et"</div>';
-    return;
-  }
+  if(!activeStrats.length){list.innerHTML='<div class="empty" style="font-size:13px">Henüz strateji eklenmedi.</div>';return;}
   list.innerHTML=activeStrats.map(s=>`
     <div class="strat-item ${s.active?'':'inactive'}">
       <div class="strat-info">
-        <div class="strat-sym">${s.symbol} <span style="color:var(--muted);font-size:9px">${s.tf}</span></div>
+        <div class="strat-sym">${s.symbol} <span style="color:var(--muted);font-size:11px;font-weight:400">${s.tf}</span></div>
         <div class="strat-detail">${s.ma_type}(${s.fast}/${s.slow}) · ${s.lot}L · ATR×${s.atr_mult}</div>
       </div>
       <div class="strat-actions">
         <button class="sbtn tog" onclick="toggleStrat('${s.id}')">${s.active?'Dur':'Başlat'}</button>
         <button class="sbtn del" onclick="deleteStrat('${s.id}')">✕</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-async function toggleStrat(id){
-  await fetch(`${API}/strategies/${id}/toggle`,{method:'POST'});
-  fetchAll();
-}
-async function deleteStrat(id){
-  await fetch(`${API}/strategies/${id}`,{method:'DELETE'});
-  fetchAll();
-}
+async function toggleStrat(id){await fetch(`${API}/strategies/${id}/toggle`,{method:'POST'});fetchAll();}
+async function deleteStrat(id){await fetch(`${API}/strategies/${id}`,{method:'DELETE'});fetchAll();}
 
-// Optimizer tablosunda satıra tıklayınca
 document.getElementById('opt-body').addEventListener('click',async e=>{
   const row=e.target.closest('tr');if(!row)return;
   const cells=row.querySelectorAll('td');if(cells.length<2)return;
@@ -609,29 +546,20 @@ document.getElementById('opt-body').addEventListener('click',async e=>{
   const mt=document.getElementById('ma-type').value;
   bestMA={fast:f,slow:s,type:mt};
   const tf=document.getElementById('tf-sel').value;
-  if(barCache[activeSym+'_'+tf]){drawMain(barCache[activeSym+'_'+tf]);updateSig(barCache[activeSym+'_'+tf]);}
-  document.querySelectorAll('#opt-body tr').forEach(r=>r.classList.remove('best'));
-  row.classList.add('best');
-
-  // Aktif Et sor
-  if(!confirm(`${activeSym} için MA(${f}/${s}) ${mt} stratejisini aktif etmek ister misin?`))return;
+  if(barCache[activeSym+'_'+tf])updateSig(barCache[activeSym+'_'+tf]);
+  document.querySelectorAll('#opt-body tr').forEach(r=>r.classList.remove('best'));row.classList.add('best');
+  if(!confirm(`${activeSym} için ${mt}(${f}/${s}) stratejisini aktif etmek ister misin?`))return;
   const id=`${activeSym}_${tf}_${f}_${s}_${mt}`;
   await fetch(API+'/strategies',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      id, symbol:activeSym, tf,
-      fast:f, slow:s, ma_type:mt,
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id,symbol:activeSym,tf,fast:f,slow:s,ma_type:mt,
       lot:+document.getElementById('o-lot').value,
-      sl_pip:+document.getElementById('o-sl').value,
-      atr_mult:+document.getElementById('o-atr').value,
-      active:true
-    })
+      sl_pip:+(document.getElementById('o-sl').value||0),
+      atr_mult:+document.getElementById('o-atr').value,active:true})
   });
   fetchAll();
 });
 
-// ── MA ──
 function calcMA(c,p,type='EMA'){
   const r=new Array(c.length).fill(null);if(c.length<p)return r;
   if(type==='SMA'){for(let i=p-1;i<c.length;i++){let s=0;for(let j=0;j<p;j++)s+=c[i-j];r[i]=s/p;}}
@@ -640,86 +568,25 @@ function calcMA(c,p,type='EMA'){
   return r;
 }
 
-// ── GRAFİK ──
-function drawMain(bars){
-  const cv=document.getElementById('main-canvas'),dpr=devicePixelRatio||1;
-  const W=cv.offsetWidth,H=cv.offsetHeight||280;
-  if(!W||!H)return;
-  cv.width=W*dpr;cv.height=H*dpr;
-  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
-  const fP=bestMA.fast,sP=bestMA.slow,mt=bestMA.type;
-  const n=Math.min(bars.length,250),data=bars.slice(-n),closes=data.map(b=>b.c);
-  const maF=calcMA(closes,fP,mt),maS=calcMA(closes,sP,mt);
-  const minV=Math.min(...data.map(b=>b.l)),maxV=Math.max(...data.map(b=>b.h)),rng=maxV-minV||.0001;
-  const pad={t:14,r:8,b:26,l:68},cW=W-pad.l-pad.r,cH=H-pad.t-pad.b,bW=cW/n;
-  ctx.clearRect(0,0,W,H);
-  // Grid
-  ctx.strokeStyle='#f1f5f9';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){
-    const y=pad.t+(i/4)*cH;
-    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
-    ctx.fillStyle='#94a3b8';ctx.font='8px Inter';ctx.textAlign='right';
-    ctx.fillText(f5(maxV-(i/4)*rng),pad.l-2,y+3);
-  }
-  // Zaman
-  ctx.fillStyle='#94a3b8';ctx.font='8px Inter';ctx.textAlign='center';
-  [0,Math.floor(n/4),Math.floor(n/2),Math.floor(3*n/4),n-1].forEach(i=>{
-    if(!data[i])return;
-    const d=new Date(data[i].t*1000);
-    ctx.fillText((d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2),pad.l+i*bW+bW/2,pad.t+cH+15);
-  });
-  // Mumlar
-  data.forEach((b,i)=>{
-    const x=pad.l+i*bW+bW/2,bull=b.c>=b.o;
-    const yO=pad.t+(1-(b.o-minV)/rng)*cH,yC=pad.t+(1-(b.c-minV)/rng)*cH;
-    const yH=pad.t+(1-(b.h-minV)/rng)*cH,yL=pad.t+(1-(b.l-minV)/rng)*cH;
-    ctx.strokeStyle=bull?'#16a34a':'#dc2626';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();
-    ctx.fillStyle=bull?'rgba(22,163,74,.75)':'rgba(220,38,38,.75)';
-    ctx.fillRect(x-bW*.38,Math.min(yO,yC),bW*.76,Math.abs(yC-yO)||1);
-  });
-  // MA
-  function line(ma,color,lw){
-    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;let s=false;
-    ma.forEach((v,i)=>{if(!v)return;const x=pad.l+i*bW+bW/2,y=pad.t+(1-(v-minV)/rng)*cH;s?ctx.lineTo(x,y):(ctx.moveTo(x,y),s=true)});ctx.stroke();
-  }
-  line(maF,'#2563eb',1.5);line(maS,'#f97316',1.3);
-  // Kesişimler
-  for(let i=1;i<n;i++){
-    if(!maF[i]||!maS[i]||!maF[i-1]||!maS[i-1])continue;
-    const cUp=maF[i]>maS[i]&&maF[i-1]<=maS[i-1],cDn=maF[i]<maS[i]&&maF[i-1]>=maS[i-1];
-    if(cUp||cDn){
-      const x=pad.l+i*bW+bW/2,y=pad.t+(1-(maF[i]-minV)/rng)*cH;
-      ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);
-      ctx.fillStyle=cUp?'#16a34a':'#dc2626';ctx.fill();
-      ctx.strokeStyle='#fff';ctx.lineWidth=1.2;ctx.stroke();
-    }
-  }
-  // Legend
-  ctx.font='9px Inter';ctx.textAlign='left';
-  ctx.fillStyle='#2563eb';ctx.fillText(`MA(${fP}) ${mt}`,pad.l+3,pad.t+10);
-  ctx.fillStyle='#f97316';ctx.fillText(`MA(${sP}) ${mt}`,pad.l+80,pad.t+10);
-}
-
-// ── OPTIMIZER ──
 document.getElementById('btn-opt').addEventListener('click',async()=>{
   const tf=document.getElementById('tf-sel').value,bars=barCache[activeSym+'_'+tf];
   if(!bars?.length){alert('Bar verisi yok.');return;}
   const fMin=+document.getElementById('f-min').value,fMax=+document.getElementById('f-max').value;
   const sMin=+document.getElementById('s-min').value,sMax=+document.getElementById('s-max').value;
   const mt=document.getElementById('ma-type').value,lot=+document.getElementById('o-lot').value||0.05;
-  const slPip=+document.getElementById('o-sl').value,tpPip=+document.getElementById('o-tp').value;
+  const slPip=+(document.getElementById('o-sl').value||0);
+  const tpPip=+(document.getElementById('o-tp').value||0);
   const btn=document.getElementById('btn-opt');btn.disabled=true;btn.textContent='Hesaplanıyor...';
   const prog=document.getElementById('prog'),pf=document.getElementById('prog-f');prog.style.display='block';
 
   const closes=bars.map(b=>b.c);
   const price=closes[closes.length-1];
-  // Tick value'dan pip değeri al (daha doğru)
   const tv=allTicks[activeSym]?.tick_value||0;
   const point=price<10?0.00001:price<200?0.001:0.01;
-  // pip değeri: tick_value varsa kullan, yoksa tahmin
   const pipVal=tv>0?(tv*lot):(price<10?10*lot:price<200?lot:0.1*lot);
-  const slPts=slPip*10,tpPts=tpPip*10;
+  // SL/TP 0 ise çok büyük bir değer koy — sadece ters kesişimde çıksın
+  const slPts=slPip>0?slPip*10:999999;
+  const tpPts=tpPip>0?tpPip*10:999999;
 
   const combos=[];
   for(let f=fMin;f<=fMax;f++)for(let s=sMin;s<=sMax;s++)if(s>f)combos.push([f,s]);
@@ -734,23 +601,17 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
     if(done<combos.length){await new Promise(r=>setTimeout(r,0));await chunk(start+30);}
   }
   await chunk(0);
-
-  // PF × WR dengesi
-  results.sort((a,b)=>{
-    const sA=(a.pf===999?5:a.pf)*(a.wr/100);
-    const sB=(b.pf===999?5:b.pf)*(b.wr/100);
-    return sB-sA;
-  });
+  results.sort((a,b)=>{const sA=(a.pf===999?5:a.pf)*(a.wr/100);const sB=(b.pf===999?5:b.pf)*(b.wr/100);return sB-sA;});
 
   set('opt-count','('+results.length+')');
   const tb=document.getElementById('opt-body');
   if(!results.length){
-    tb.innerHTML='<tr><td colspan="8" class="empty">Kriter karşılanamadı — SL/TP artır veya aralığı genişlet<br><small style="color:var(--light)">Min: 20 işlem · W%≥45 · PF≥1.5</small></td></tr>';
+    tb.innerHTML='<tr><td colspan="8" class="empty">Kriter karşılanamadı<br><span style="color:var(--light);font-size:12px">Min 20 işlem · W%≥45 · PF≥1.5<br>SL/TP artır veya aralığı genişlet</span></td></tr>';
   }else{
     const best=results[0];
     bestMA={fast:best.f,slow:best.s,type:mt};
     const tf2=document.getElementById('tf-sel').value;
-    if(barCache[activeSym+'_'+tf2]){drawMain(barCache[activeSym+'_'+tf2]);updateSig(barCache[activeSym+'_'+tf2]);}
+    if(barCache[activeSym+'_'+tf2])updateSig(barCache[activeSym+'_'+tf2]);
     const br=document.getElementById('best-banner');
     br.style.display='block';
     br.textContent=`✓ MA(${best.f})+MA(${best.s}) · ${best.wins}W/${best.losses}L · PF ${best.pf===999?'∞':best.pf.toFixed(2)} · ${best.profit>=0?'+':''}${f2(best.profit)}$`;
@@ -766,11 +627,9 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   btn.disabled=false;btn.textContent='⚡ Optimize Et';prog.style.display='none';
 });
 
-// ── BACKTEST ──
 function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
   const mF=calcMA(closes,fP,mt),mS=calcMA(closes,sP,mt);
-  let trades=0,wins=0,losses=0,gW=0,gL=0,totalP=0,inT=false,dir=0,ep=0;
-  let equity=0,peak=0,maxDD=0;
+  let trades=0,wins=0,losses=0,gW=0,gL=0,totalP=0,inT=false,dir=0,ep=0,equity=0,peak=0,maxDD=0;
   for(let i=sP+1;i<closes.length;i++){
     if(!mF[i]||!mS[i])continue;
     const cUp=mF[i]>mS[i]&&mF[i-1]<=mS[i-1],cDn=mF[i]<mS[i]&&mF[i-1]>=mS[i-1];
@@ -796,7 +655,6 @@ function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function f5(v){return Number(v).toFixed(5)}
 function f2(v){return Number(v).toFixed(2)}
 function f1(v){return Number(v).toFixed(1)}
-new ResizeObserver(()=>{const tf=document.getElementById('tf-sel').value,b=barCache[activeSym+'_'+tf];if(b)drawMain(b);}).observe(document.getElementById('main-canvas'));
 </script>
 </body>
 </html>
