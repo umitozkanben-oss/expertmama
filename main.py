@@ -61,7 +61,7 @@ async def recv_bars(request: Request):
     key = sym + "_" + tf
     with lock:
         if key not in bar_data:
-            bar_data[key] = collections.deque(maxlen=1000)
+            bar_data[key] = collections.deque(maxlen=2000)
         existing = {b["t"] for b in bar_data[key]}
         for b in bars:
             if b.get("t") not in existing:
@@ -107,7 +107,7 @@ def get_data():
         }
 
 @app.get("/bars/{symbol}")
-def get_bars(symbol: str, limit: int = 500, tf: str = "M15"):
+def get_bars(symbol: str, limit: int = 1000, tf: str = "M15"):
     sym = symbol.upper()
     tf  = tf.upper()
     if tf not in VALID_TF: tf = "M15"

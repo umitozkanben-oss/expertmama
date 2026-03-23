@@ -45,10 +45,10 @@ void OnTimer(void)
   {
    if(!g_bars_sent)
      {
-      SendBars(PERIOD_M5,  500);
-      SendBars(PERIOD_M15, 500);
-      SendBars(PERIOD_H1,  500);
-      SendBars(PERIOD_H4,  500);
+      SendBars(PERIOD_M5,  1000);
+      SendBars(PERIOD_M15, 1000);
+      SendBars(PERIOD_H1,  1000);
+      SendBars(PERIOD_H4,  1000);
       SendPositions();
       g_bars_sent = true;
       printf("İlk bar verisi gönderildi (M5/M15/H1/H4).");
@@ -128,6 +128,9 @@ void SendBars(ENUM_TIMEFRAMES tf, int count)
 //+------------------------------------------------------------------+
 void SendPositions()
   {
+   // Tüm geçmişi MT5 RAM'ine yükle
+   HistorySelect(0, TimeCurrent());
+
    string json = "{\"positions\":[";
    int total = PositionsTotal();
    bool first = true;

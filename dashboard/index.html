@@ -299,7 +299,7 @@ async function fetchBars(sym){
   if(!API)return;
   const tf=document.getElementById('tf-sel').value;
   try{
-    const r=await fetch(`${API}/bars/${sym}?limit=500&tf=${tf}`);
+    const r=await fetch(`${API}/bars/${sym}?limit=1000&tf=${tf}`);
     if(!r.ok)return;
     const d=await r.json();
     if(d.bars?.length){
@@ -561,7 +561,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   async function chunk(start){
     for(let i=start;i<Math.min(start+30,combos.length);i++){
       const[f,s]=combos[i],r=bt(closes,f,s,mt,sl,tp,point,pipVal);
-      if(r.trades>=3)results.push({f,s,...r});done++;
+      if(r.trades>=15)results.push({f,s,...r});done++;
     }
     pf.style.width=(done/combos.length*100).toFixed(1)+'%';
     if(done<combos.length){await new Promise(r=>setTimeout(r,0));await chunk(start+30);}
