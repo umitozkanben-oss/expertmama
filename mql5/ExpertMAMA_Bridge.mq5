@@ -148,7 +148,7 @@ void SendTick(string sym)
    json+="\"balance\":"+DoubleToString(AccountInfoDouble(ACCOUNT_BALANCE),2)+",";
    json+="\"equity\":"+DoubleToString(AccountInfoDouble(ACCOUNT_EQUITY),2)+",";
    json+="\"margin\":"+DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN),2)+",";
-   json+="\"free_margin\":"+DoubleToString(AccountInfoDouble(ACCOUNT_FREEMARGIN),2)+",";
+   json+="\"free_margin\":"+DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN_FREE),2)+",";
    json+="\"currency\":\""+AccountInfoString(ACCOUNT_CURRENCY)+"\",";
    json+="\"time\":"+IntegerToString((long)TimeCurrent());
    json+="}";
@@ -352,13 +352,14 @@ int StratMagic(int idx) { return 12100 + idx; }
 //+------------------------------------------------------------------+
 bool HasPosition(string sym, int magic, long &pos_type, ulong &pos_ticket)
   {
+   pos_type=0; pos_ticket=0;
    for(int i=0;i<PositionsTotal();i++)
      {
       ulong t=PositionGetTicket(i);
       if(t==0) continue;
-      if(PositionGetString(POSITION_SYMBOL)==sym&&PositionGetInteger(POSITION_MAGIC)==magic)
+      if(PositionGetString(POSITION_SYMBOL)==sym&&(long)PositionGetInteger(POSITION_MAGIC)==magic)
         {
-         pos_type=PositionGetInteger(POSITION_TYPE);
+         pos_type=(long)PositionGetInteger(POSITION_TYPE);
          pos_ticket=t;
          return true;
         }
@@ -400,66 +401,67 @@ void RunStrategies()
   {
    for(int i=0;i<g_strat_count;i++)
      {
-      Strategy &s=g_strategies[i];
-      ENUM_TIMEFRAMES tf=StrToTF(s.tf);
+      string sym     = g_strategies[i].symbol;
+      string tf_str  = g_strategies[i].tf;
+      int    fast    = g_strategies[i].fast;
+      int    slow    = g_strategies[i].slow;
+      string ma_type = g_strategies[i].ma_type;
+      double lot     = g_strategies[i].lot;
+      double atr_mult= g_strategies[i].atr_mult;
+      string strat_id= g_strategies[i].id;
+
+      ENUM_TIMEFRAMES tf=StrToTF(tf_str);
       int magic=StratMagic(i);
 
       // Sadece yeni barda işlem sinyali kontrol et
-      datetime cur_bar=iTime(s.symbol,tf,0);
-      if(cur_bar==g_strat_last_bar[i]) 
+      datetime cur_bar=iTime(sym,tf,0);
+      if(cur_bar==g_strat_last_bar[i])
         {
-         // Aynı bar — sadece trailing güncelle
          long pos_type; ulong pos_ticket;
-         if(HasPosition(s.symbol,magic,pos_type,pos_ticket))
-            UpdateTrailingSL(s.symbol,pos_ticket,tf,s.atr_mult);
+         if(HasPosition(sym,magic,pos_type,pos_ticket))
+            UpdateTrailingSL(sym,pos_ticket,tf,atr_mult);
          continue;
         }
       g_strat_last_bar[i]=cur_bar;
 
-      // MA değerleri: shift=1 (kapanan bar), shift=2 (önceki bar)
-      double mF_cur  = GetMA(s.symbol,tf,s.fast,s.ma_type,1);
-      double mS_cur  = GetMA(s.symbol,tf,s.slow,s.ma_type,1);
-      double mF_prev = GetMA(s.symbol,tf,s.fast,s.ma_type,2);
-      double mS_prev = GetMA(s.symbol,tf,s.slow,s.ma_type,2);
+      double mF_cur  = GetMA(sym,tf,fast,ma_type,1);
+      double mS_cur  = GetMA(sym,tf,slow,ma_type,1);
+      double mF_prev = GetMA(sym,tf,fast,ma_type,2);
+      double mS_prev = GetMA(sym,tf,slow,ma_type,2);
 
       if(mF_cur==0||mS_cur==0||mF_prev==0||mS_prev==0) continue;
 
       bool crossUp = mF_cur>mS_cur && mF_prev<=mS_prev;
       bool crossDn = mF_cur<mS_cur && mF_prev>=mS_prev;
 
-      if(!crossUp&&!crossDn) continue; // Kesişim yok
+      if(!crossUp&&!crossDn) continue;
 
-      // Mevcut pozisyon var mı?
       long  pos_type=0; ulong pos_ticket=0;
-      bool  has_pos=HasPosition(s.symbol,magic,pos_type,pos_ticket);
+      bool  has_pos=HasPosition(sym,magic,pos_type,pos_ticket);
 
-      double point = SymbolInfoDouble(s.symbol,SYMBOL_POINT);
-      double atr   = GetATR(s.symbol,tf,14,1);
-      double sl_dist = (atr>0) ? atr*s.atr_mult : s.sl_pip*10*point;
+      double point   = SymbolInfoDouble(sym,SYMBOL_POINT);
+      double atr     = GetATR(sym,tf,14,1);
+      double sl_dist = (atr>0) ? atr*atr_mult : g_strategies[i].sl_pip*10*point;
 
       if(crossUp)
         {
-         // Önce SELL varsa kapat
          if(has_pos&&pos_type==POSITION_TYPE_SELL)
             trade.PositionClose(pos_ticket);
-         // BUY aç
-         double ask = SymbolInfoDouble(s.symbol,SYMBOL_ASK);
+         double ask = SymbolInfoDouble(sym,SYMBOL_ASK);
          double sl  = ask - sl_dist;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Buy(s.lot,s.symbol,ask,sl,0,"ExpertMAMA_"+s.id))
-            printf("BUY açıldı: "+s.symbol+" "+s.id+" SL="+DoubleToString(sl,5));
+         if(trade.Buy(lot,sym,ask,sl,0,"ExpertMAMA_"+strat_id))
+            printf("BUY açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
         }
       else if(crossDn)
         {
-         // Önce BUY varsa kapat
          if(has_pos&&pos_type==POSITION_TYPE_BUY)
             trade.PositionClose(pos_ticket);
-         // SELL aç
-         double bid = SymbolInfoDouble(s.symbol,SYMBOL_BID);
+         double bid = SymbolInfoDouble(sym,SYMBOL_BID);
          double sl  = bid + sl_dist;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Sell(s.lot,s.symbol,bid,sl,0,"ExpertMAMA_"+s.id))
-            printf("SELL açıldı: "+s.symbol+" "+s.id+" SL="+DoubleToString(sl,5));
+         if(trade.Sell(lot,sym,bid,sl,0,"ExpertMAMA_"+strat_id))
+            printf("SELL açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
         }
      }
   }
