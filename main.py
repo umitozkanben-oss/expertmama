@@ -1,204 +1,118 @@
 """
-ExpertMAMA Cloud Backend
-FastAPI — Contabo VPS Ubuntu 20/22
+ExpertMAMA Cloud Backend v2
+FastAPI — Contabo VPS Ubuntu 24
 Port: 8765
 """
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 import json, time, collections, threading
-from datetime import datetime
 
-app = FastAPI(title="ExpertMAMA API", version="1.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ── VERİ DEPOSU ──
-# Her sembol için son 2000 bar saklanır (RAM dostu)
-MAX_BARS   = 2000
-MAX_TICKS  = 500
+app = FastAPI(title="ExpertMAMA API", version="2.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 lock = threading.Lock()
 
-# { "EURUSD": deque([{t, o, h, l, c, v}, ...]) }
-bar_data   = {}
-
-# { "EURUSD": {"bid":..., "ask":..., "time":...} }
-tick_data  = {}
-
-# { "EURUSD": deque([{time, price}, ...]) }  — equity için
-equity_history = collections.deque(maxlen=200)
-
-# Açık pozisyonlar ve işlem geçmişi
-open_positions = {}   # ticket → pos dict
-trade_history  = collections.deque(maxlen=500)
-
-# Bağlı semboller
-connected_symbols = set()
+bar_data       = {}   # "EURUSD_M15" → deque
+tick_data      = {}
+equity_history = collections.deque(maxlen=500)
+open_positions = {}
+trade_history  = collections.deque(maxlen=1000)
 last_heartbeat = {}
+connected_syms = set()
 
-# ── DESTEKLENEN SEMBOLLER ──
-ALLOWED_SYMBOLS = {
-    # Majors
-    "EURUSD","GBPUSD","USDJPY","USDCHF","AUDUSD","NZDUSD","USDCAD",
-    # Minors
-    "EURGBP","EURJPY","EURCHF","EURCAD","EURAUD","EURNZD",
-    "GBPJPY","GBPCHF","GBPCAD","GBPAUD","GBPNZD",
-    "AUDJPY","AUDCHF","AUDCAD","AUDNZD",
-    "NZDJPY","NZDCHF","NZDCAD",
-    "CADJPY","CADCHF","CHFJPY",
-    # Emtialar & Kripto & Endeksler
-    "XAUUSD","XAGUSD","BTCUSD","ETHUSD","US100","US500","GER40",
-}
-
-# ── ENDPOINTS ──
+VALID_TF = {"M5","M15","H1","H4"}
 
 @app.get("/")
-def root():
-    return {"status": "ok", "service": "ExpertMAMA Cloud API", "time": int(time.time())}
+def root(): return {"status":"ok"}
 
 @app.get("/health")
 def health():
-    return {
-        "status":   "ok",
-        "symbols":  list(connected_symbols),
-        "uptime":   int(time.time()),
-    }
+    now = time.time()
+    active = {s for s,t in last_heartbeat.items() if now-t < 30}
+    return {"status":"ok","symbols":list(active),"uptime":int(now)}
 
-# ── TICK VERİSİ (MT5 EA her tick'te POST atar) ──
 @app.post("/tick")
-async def receive_tick(request: Request):
+async def recv_tick(request: Request):
     try:
-        raw  = await request.body()
-        text = raw.decode("latin-1")
-        data = json.loads(text)
+        data = json.loads((await request.body()).decode("latin-1"))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Parse error: {e}")
-
-    symbol = data.get("symbol", "").upper().strip()
-    if not symbol:
-        raise HTTPException(status_code=400, detail="symbol missing")
-
+        raise HTTPException(400, str(e))
+    sym = data.get("symbol","").upper().strip()
+    if not sym: raise HTTPException(400,"symbol missing")
     with lock:
-        tick_data[symbol] = {
-            "symbol":  symbol,
-            "bid":     data.get("bid", 0),
-            "ask":     data.get("ask", 0),
-            "spread":  data.get("spread", 0),
-            "time":    data.get("time", int(time.time())),
-            "balance": data.get("balance", 0),
-            "equity":  data.get("equity", 0),
-            "margin":  data.get("margin", 0),
-            "free_margin": data.get("free_margin", 0),
-            "currency": data.get("currency", "USD"),
-        }
-        connected_symbols.add(symbol)
-        last_heartbeat[symbol] = time.time()
+        tick_data[sym] = {**data, "symbol":sym}
+        connected_syms.add(sym)
+        last_heartbeat[sym] = time.time()
+        equity_history.append({"t":int(time.time()),"v":data.get("equity",0)})
+    return {"status":"ok"}
 
-        # Equity geçmişi
-        equity_history.append({
-            "t": int(time.time()),
-            "v": data.get("equity", 0),
-        })
-
-    return {"status": "ok"}
-
-# ── BAR VERİSİ (EA her kapanan barda POST atar) ──
 @app.post("/bars")
-async def receive_bars(request: Request):
+async def recv_bars(request: Request):
     try:
-        raw  = await request.body()
-        text = raw.decode("latin-1")
-        data = json.loads(text)
+        data = json.loads((await request.body()).decode("latin-1"))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Parse error: {e}")
-
-    symbol = data.get("symbol", "").upper().strip()
-    bars   = data.get("bars", [])
-
-    if not symbol or not bars:
-        raise HTTPException(status_code=400, detail="symbol or bars missing")
-
+        raise HTTPException(400, str(e))
+    sym  = data.get("symbol","").upper().strip()
+    tf   = data.get("tf","M15").upper().strip()
+    bars = data.get("bars",[])
+    if not sym or not bars: raise HTTPException(400,"missing")
+    if tf not in VALID_TF: tf = "M15"
+    key = sym + "_" + tf
     with lock:
-        if symbol not in bar_data:
-            bar_data[symbol] = collections.deque(maxlen=MAX_BARS)
-
-        existing_times = {b["t"] for b in bar_data[symbol]}
-        new_count = 0
+        if key not in bar_data:
+            bar_data[key] = collections.deque(maxlen=1000)
+        existing = {b["t"] for b in bar_data[key]}
         for b in bars:
-            if b.get("t") not in existing_times:
-                bar_data[symbol].append(b)
-                new_count += 1
+            if b.get("t") not in existing:
+                bar_data[key].append(b)
+        sorted_bars = sorted(bar_data[key], key=lambda x: x["t"])
+        bar_data[key] = collections.deque(sorted_bars, maxlen=1000)
+    return {"status":"ok"}
 
-        # Zamana göre sırala
-        sorted_bars = sorted(bar_data[symbol], key=lambda x: x["t"])
-        bar_data[symbol] = collections.deque(sorted_bars, maxlen=MAX_BARS)
-
-    return {"status": "ok", "added": new_count}
-
-# ── POZİSYON VERİSİ ──
 @app.post("/positions")
-async def receive_positions(request: Request):
+async def recv_positions(request: Request):
     try:
-        raw  = await request.body()
-        text = raw.decode("latin-1")
-        data = json.loads(text)
+        data = json.loads((await request.body()).decode("latin-1"))
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Parse error: {e}")
-
+        raise HTTPException(400, str(e))
     with lock:
         open_positions.clear()
-        for pos in data.get("positions", []):
+        for pos in data.get("positions",[]):
             open_positions[str(pos.get("ticket"))] = pos
+        existing_tickets = {d.get("ticket") for d in trade_history}
+        for deal in data.get("history",[]):
+            if deal.get("ticket") not in existing_tickets:
+                trade_history.appendleft(deal)
+                existing_tickets.add(deal.get("ticket"))
+    return {"status":"ok"}
 
-        for deal in data.get("history", []):
-            trade_history.appendleft(deal)
-
-    return {"status": "ok"}
-
-# ── GET: DASHBOARD VERİSİ ──
 @app.get("/data")
 def get_data():
     with lock:
-        # Bağlı sembolleri kontrol et (30sn timeout)
         now = time.time()
-        active = {s for s, t in last_heartbeat.items() if now - t < 30}
-
+        active = {s for s,t in last_heartbeat.items() if now-t < 30}
         return {
             "ticks":          dict(tick_data),
             "symbols":        list(active),
             "equity_history": list(equity_history),
             "open_positions": list(open_positions.values()),
-            "trade_history":  list(trade_history)[:100],
+            "trade_history":  list(trade_history),
             "server_time":    int(now),
         }
 
 @app.get("/bars/{symbol}")
-def get_bars(symbol: str, limit: int = 500, tf: str = ""):
+def get_bars(symbol: str, limit: int = 500, tf: str = "M15"):
     sym = symbol.upper()
-    key = sym + ("_" + tf if tf else "")
+    tf  = tf.upper()
+    if tf not in VALID_TF: tf = "M15"
+    key = sym + "_" + tf
     with lock:
-        # tf varsa o anahtara bak, yoksa düz sembol
-        data = bar_data.get(key) or bar_data.get(sym)
+        data = bar_data.get(key)
         if not data:
-            return {"symbol": sym, "bars": [], "count": 0}
-        bars = list(data)
-        return {
-            "symbol": sym,
-            "bars":   bars[-limit:],
-            "count":  len(bars),
-        }
-
-@app.get("/ticks")
-def get_ticks():
-    with lock:
-        return dict(tick_data)
+            return {"symbol":sym,"tf":tf,"bars":[],"count":0}
+        bars = list(data)[-limit:]
+        return {"symbol":sym,"tf":tf,"bars":bars,"count":len(bars)}
 
 if __name__ == "__main__":
     import uvicorn
