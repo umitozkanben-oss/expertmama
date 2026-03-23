@@ -7,19 +7,19 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:       #05080f;
-  --s1:       #0a0f1e;
-  --s2:       #0f1628;
-  --border:   #1c2a45;
-  --accent:   #3d7eff;
-  --cyan:     #00d4ff;
-  --buy:      #00e676;
-  --sell:     #ff3d5a;
-  --warn:     #ffb300;
-  --text:     #c8d8f0;
-  --muted:    #3d5070;
-  --glow-a:   0 0 20px rgba(61,126,255,.25);
-  --glow-c:   0 0 20px rgba(0,212,255,.2);
+  --bg:       #f0f4f8;
+  --s1:       #ffffff;
+  --s2:       #e8edf5;
+  --border:   #c8d4e8;
+  --accent:   #2563eb;
+  --cyan:     #0891b2;
+  --buy:      #16a34a;
+  --sell:     #dc2626;
+  --warn:     #d97706;
+  --text:     #1e293b;
+  --muted:    #64748b;
+  --glow-a:   0 0 20px rgba(37,99,235,.15);
+  --glow-c:   0 0 20px rgba(8,145,178,.15);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -35,10 +35,11 @@ code,pre,.mono{font-family:'JetBrains Mono',monospace}
 header{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 28px;
-  background:rgba(10,15,30,.95);
+  background:rgba(255,255,255,.95);
   border-bottom:1px solid var(--border);
   backdrop-filter:blur(16px);
   position:sticky;top:0;z-index:200;
+  box-shadow:0 1px 8px rgba(0,0,0,.06);
 }
 .logo{font-size:1rem;font-weight:800;letter-spacing:.08em;color:var(--cyan);text-shadow:var(--glow-c)}
 .logo em{color:var(--muted);font-style:normal}
@@ -205,23 +206,48 @@ tbody tr.best-row{background:rgba(0,230,118,.05);border-left:2px solid var(--buy
 /* ── NO CONNECTION ── */
 #no-conn{
   display:flex;position:fixed;inset:0;z-index:300;
-  background:rgba(5,8,15,.95);
-  flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:rgba(240,244,248,.97);
+  flex-direction:column;align-items:center;justify-content:center;gap:18px;
 }
-#no-conn h2{font-size:1.1rem;color:var(--cyan);letter-spacing:.08em}
-#no-conn p{font-size:.8rem;color:var(--muted);text-align:center;max-width:380px;line-height:1.7}
-#no-conn .nc-icon{font-size:2.5rem}
+#no-conn h2{font-size:1.4rem;color:var(--accent);letter-spacing:.04em;font-weight:800}
+#no-conn p{font-size:.9rem;color:var(--muted);text-align:center;max-width:420px;line-height:1.8}
+#no-conn .nc-icon{font-size:3.5rem}
+#no-conn .nc-box{
+  background:#fff;border:2px solid var(--border);border-radius:14px;
+  padding:28px 36px;display:flex;flex-direction:column;gap:14px;
+  box-shadow:0 4px 24px rgba(0,0,0,.08);min-width:360px;
+}
+#no-conn .nc-row{display:flex;gap:10px;align-items:center}
+#no-conn input{
+  flex:1;background:var(--s2);border:2px solid var(--border);border-radius:8px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:.9rem;padding:10px 14px;outline:none;
+}
+#no-conn input:focus{border-color:var(--accent)}
+#no-conn button{
+  background:var(--accent);color:#fff;border:none;border-radius:8px;
+  padding:10px 22px;font-size:.9rem;font-weight:800;cursor:pointer;
+  white-space:nowrap;transition:opacity .2s;
+}
+#no-conn button:hover{opacity:.85}
 </style>
 </head>
 <body>
 
 <div id="no-conn">
-  <div class="nc-icon">🔌</div>
-  <h2>VPS'e Bağlanılıyor</h2>
-  <p>
-    Yukarıdaki alana VPS IP adresinizi girin ve <strong>Bağlan</strong>'a tıklayın.<br>
-    MT5 EA'nın grafikte çalışıyor olması gerekir.
-  </p>
+  <div class="nc-icon">📡</div>
+  <h2>ExpertMAMA · Strategy Lab</h2>
+  <p>VPS adresinizi girin ve bağlanın.<br>MT5 EA'nın grafikte çalışıyor olması gerekir.</p>
+  <div class="nc-box">
+    <div style="font-size:.75rem;color:var(--muted);font-weight:700;letter-spacing:.08em">VPS API ADRESİ</div>
+    <div class="nc-row">
+      <input id="vps-url-overlay" type="text" placeholder="http://94.250.203.232:8765" value="http://94.250.203.232:8765">
+      <button id="btn-connect-overlay">Bağlan</button>
+    </div>
+    <div style="font-size:.72rem;color:var(--muted);text-align:center">
+      Dashboard: <code style="color:var(--accent)">http://94.250.203.232</code>
+    </div>
+  </div>
 </div>
 
 <header>
@@ -436,6 +462,18 @@ setInterval(() => {
 // ══════════════════════════════════════════════
 //  CONNECT
 // ══════════════════════════════════════════════
+document.getElementById('btn-connect-overlay').addEventListener('click', () => {
+  const val = document.getElementById('vps-url-overlay').value.trim();
+  if (val) document.getElementById('vps-url').value = val;
+  connect();
+});
+document.getElementById('vps-url-overlay').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const val = document.getElementById('vps-url-overlay').value.trim();
+    if (val) document.getElementById('vps-url').value = val;
+    connect();
+  }
+});
 document.getElementById('btn-connect').addEventListener('click', connect);
 document.getElementById('vps-url').addEventListener('keydown', e => {
   if (e.key === 'Enter') connect();
