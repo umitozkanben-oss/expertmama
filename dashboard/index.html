@@ -266,7 +266,7 @@ function renderSymTabs(syms){
 function renderTick(t){
   if(!t)return;
   set('p-sym',t.symbol);set('p-bid',f5(t.bid));set('p-ask',f5(t.ask));
-  set('p-spread',f1(t.spread)+' p');set('p-bal',f2(t.balance)+' '+(t.currency||''));
+  set('p-spread',f1(t.spread/10)+' pip');set('p-bal',f2(t.balance)+' '+(t.currency||''));
   set('p-eq',f2(t.equity));set('p-fm',f2(t.free_margin));
   const tf=document.getElementById('tf-sel').value,bars=barCache[t.symbol+'_'+tf];
   const sig=bars?getSig(bars,12):'NEUTRAL';

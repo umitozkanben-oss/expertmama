@@ -80,11 +80,16 @@ async def recv_positions(request: Request):
         open_positions.clear()
         for pos in data.get("positions",[]):
             open_positions[str(pos.get("ticket"))] = pos
-        existing_tickets = {d.get("ticket") for d in trade_history}
+        # Ticket bazlı biriktir — aynı ticket gelirse güncelle
+        existing = {d.get("ticket"): i for i, d in enumerate(trade_history)}
         for deal in data.get("history",[]):
-            if deal.get("ticket") not in existing_tickets:
+            t = deal.get("ticket")
+            if t in existing:
+                # Güncelle (profit değişmiş olabilir)
+                list(trade_history)[existing[t]].update(deal)
+            else:
                 trade_history.appendleft(deal)
-                existing_tickets.add(deal.get("ticket"))
+                existing[t] = 0
     return {"status":"ok"}
 
 @app.get("/data")

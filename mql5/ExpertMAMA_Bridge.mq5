@@ -154,11 +154,6 @@ void SendPositions()
 
    json += "],\"history\":[";
 
-   // Bugün gece yarısından itibaren
-   MqlDateTime dt; TimeCurrent(dt);
-   dt.hour = 0; dt.min = 0; dt.sec = 0;
-   datetime today = StructToTime(dt);
-
    int deals = HistoryDealsTotal();
    first = true;
    for(int i = deals - 1; i >= 0; i--)
@@ -169,7 +164,6 @@ void SendPositions()
       long dtype = HistoryDealGetInteger(ticket, DEAL_TYPE);
       if(dtype != DEAL_TYPE_BUY && dtype != DEAL_TYPE_SELL) continue;
       datetime deal_time = (datetime)HistoryDealGetInteger(ticket, DEAL_TIME);
-      if(deal_time < today) continue;
 
       double profit = HistoryDealGetDouble(ticket, DEAL_PROFIT);
       if(!first) json += ",";
