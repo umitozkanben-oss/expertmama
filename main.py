@@ -5,27 +5,47 @@ Port: 8765
 """
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import json, time, collections, threading
+import json, time, collections, threading, os
 
 app = FastAPI(title="ExpertMAMA API", version="3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 lock = threading.Lock()
 
-bar_data       = {}   # "EURUSD_M15" → deque
-tick_data      = {}   # "EURUSD" → tick dict (includes tick_value)
+bar_data       = {}
+tick_data      = {}
 equity_history = collections.deque(maxlen=500)
 open_positions = {}
 trade_history  = collections.deque(maxlen=2000)
 last_heartbeat = {}
 connected_syms = set()
 
-# Aktif stratejiler: { "strat_id": { symbol, tf, fast, slow, ma_type, lot, sl_pip, atr_mult, active } }
-strategies     = {}
-# Otomatik mod
-auto_mode      = {"enabled": False}
-
 VALID_TF = {"M5","M15","H1","H4"}
+SAVE_FILE = "/opt/expertmama/data.json"
+
+# ── Kalıcı veri yükle ──
+def load_persistent():
+    global strategies, auto_mode
+    try:
+        if os.path.exists(SAVE_FILE):
+            with open(SAVE_FILE, "r") as f:
+                data = json.load(f)
+                strategies = data.get("strategies", {})
+                auto_mode  = data.get("auto_mode", {"enabled": False})
+                print(f"Veri yüklendi: {len(strategies)} strateji, oto={auto_mode['enabled']}")
+    except Exception as e:
+        print(f"Veri yüklenemedi: {e}")
+
+def save_persistent():
+    try:
+        with open(SAVE_FILE, "w") as f:
+            json.dump({"strategies": strategies, "auto_mode": auto_mode}, f)
+    except Exception as e:
+        print(f"Veri kaydedilemedi: {e}")
+
+strategies = {}
+auto_mode  = {"enabled": False}
+load_persistent()
 
 @app.get("/")
 def root(): return {"status":"ok","version":"3.0"}
@@ -108,11 +128,12 @@ async def save_strategy(request: Request):
             "slow":     int(data.get("slow",26)),
             "ma_type":  data.get("ma_type","EMA"),
             "lot":      float(data.get("lot",0.05)),
-            "sl_pip":   float(data.get("sl_pip",50)),
+            "sl_pip":   float(data.get("sl_pip",0)),
             "atr_mult": float(data.get("atr_mult",1.5)),
             "active":   bool(data.get("active",True)),
             "created":  int(time.time()),
         }
+        save_persistent()
     return {"status":"ok","id":strat_id}
 
 @app.delete("/strategies/{strat_id}")
@@ -120,6 +141,7 @@ def delete_strategy(strat_id: str):
     with lock:
         if strat_id in strategies:
             del strategies[strat_id]
+        save_persistent()
     return {"status":"ok"}
 
 @app.post("/strategies/{strat_id}/toggle")
@@ -127,15 +149,16 @@ def toggle_strategy(strat_id: str):
     with lock:
         if strat_id in strategies:
             strategies[strat_id]["active"] = not strategies[strat_id]["active"]
+        save_persistent()
     return {"status":"ok"}
 
-# ── AUTO MODE ──
 @app.post("/automode")
 async def set_automode(request: Request):
     try: data = json.loads((await request.body()).decode("latin-1"))
     except Exception as e: raise HTTPException(400, str(e))
     with lock:
         auto_mode["enabled"] = bool(data.get("enabled", False))
+        save_persistent()
     return {"status":"ok","auto_mode":auto_mode["enabled"]}
 
 # ── DATA ──
