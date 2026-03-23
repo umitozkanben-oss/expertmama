@@ -250,38 +250,14 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
 
     <!-- Optimizer sonuçları -->
     <div class="lsec" style="flex:2;display:flex;flex-direction:column;overflow:hidden;padding:8px 10px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-        <div class="lsec-title" style="margin:0">Sonuçlar <span id="opt-count" style="font-weight:400"></span></div>
-        <span style="font-size:10px;color:var(--muted)">tıkla → aktif et</span>
-      </div>
-      <div style="overflow:auto;flex:1">
-        <table>
-          <thead><tr>
-            <th>H</th><th>Y</th><th>W%</th>
-            <th style="color:var(--buy)">W</th>
-            <th style="color:var(--sell)">L</th>
-            <th>K/Z</th><th>PF</th><th>DD</th>
-          </tr></thead>
-          <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
-        </table>
-      </div>
-    </div>
+  </div><!-- /left -->
 
-    <!-- Aktif stratejiler -->
-    <div class="lsec" style="flex-shrink:0;max-height:220px;overflow-y:auto">
-      <div class="lsec-title">Aktif Stratejiler <span id="strat-count" style="font-weight:400"></span></div>
-      <div class="strat-list" id="strat-list">
-        <div class="empty" style="font-size:12px">Henüz strateji eklenmedi.</div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- SAĞ ALAN -->
+  <!-- SAĞ ALAN: optimizer sol, tablolar sağ -->
   <div class="right">
 
-    <!-- Orta: TF seçici + tablolar -->
-    <div class="main-col">
+    <!-- Sol: Optimizer sonuçları + aktif stratejiler -->
+    <div style="width:420px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)">
+      <!-- TF + sinyal -->
       <div class="tf-bar">
         <span class="tf-label">Zaman Dilimi:</span>
         <select id="tf-sel">
@@ -293,13 +269,38 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
         <div class="sig-badge" id="chart-sig">—</div>
         <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
       </div>
+      <!-- Optimizer sonuçları -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+          <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400;color:var(--muted)"></span></div>
+          <span style="font-size:11px;color:var(--muted)">tıkla → aktif et</span>
+        </div>
+        <div style="overflow:auto;flex:1">
+          <table>
+            <thead><tr>
+              <th>Hızlı</th><th>Yavaş</th><th>W%</th>
+              <th style="color:var(--buy)">W</th>
+              <th style="color:var(--sell)">L</th>
+              <th>K/Z ($)</th><th>PF</th><th>MaxDD</th>
+            </tr></thead>
+            <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Aktif stratejiler -->
+      <div style="padding:8px 10px;border-top:1px solid var(--border);flex-shrink:0;max-height:200px;overflow-y:auto">
+        <div class="lsec-title">Aktif Stratejiler <span id="strat-count" style="font-weight:400"></span></div>
+        <div class="strat-list" id="strat-list">
+          <div class="empty" style="font-size:12px">Henüz strateji eklenmedi.</div>
+        </div>
+      </div>
+    </div>
 
+    <!-- Sağ: Tablolar -->
+    <div class="main-col">
       <div class="tables-area">
-        <!-- Açık pozisyonlar -->
         <div class="tbl-panel">
-          <div class="tbl-hdr">
-            <div class="tbl-title">Açık Pozisyonlar</div>
-          </div>
+          <div class="tbl-hdr"><div class="tbl-title">Açık Pozisyonlar</div></div>
           <div class="tbl-body">
             <table>
               <thead><tr><th>Sembol</th><th>Yön</th><th>Lot</th><th>Açılış</th><th>Güncel</th><th>SL</th><th>TP</th><th>K/Z</th></tr></thead>
@@ -307,11 +308,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
             </table>
           </div>
         </div>
-        <!-- İşlem geçmişi -->
         <div class="tbl-panel">
-          <div class="tbl-hdr">
-            <div class="tbl-title" id="hist-title">Bugünün İşlemleri</div>
-          </div>
+          <div class="tbl-hdr"><div class="tbl-title" id="hist-title">Bugünün İşlemleri</div></div>
           <div class="tbl-body">
             <table>
               <thead><tr><th>Ticket</th><th>Sembol</th><th>Yön</th><th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Tarih</th></tr></thead>
