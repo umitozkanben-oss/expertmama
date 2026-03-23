@@ -1,0 +1,46 @@
+name: Deploy ExpertMAMA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-vps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     94.250.203.232
+          username: root
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /opt/expertmama
+            git pull origin main
+            source venv/bin/activate
+            pip install --quiet -r requirements.txt
+            cp -r dashboard /opt/expertmama/
+            systemctl restart expertmama
+            echo "Deploy OK: $(date)"
+
+  deploy-pages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dashboard'
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ExpertMAMA · Strategy Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #05080f;
+  --s1:       #0a0f1e;
+  --s2:       #0f1628;
+  --border:   #1c2a45;
+  --accent:   #3d7eff;
+  --cyan:     #00d4ff;
+  --buy:      #00e676;
+  --sell:     #ff3d5a;
+  --warn:     #ffb300;
+  --text:     #c8d8f0;
+  --muted:    #3d5070;
+  --glow-a:   0 0 20px rgba(61,126,255,.25);
+  --glow-c:   0 0 20px rgba(0,212,255,.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── HEADER ── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;
+  background:rgba(10,15,30,.95);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);
+  position:sticky;top:0;z-index:200;
+}
+.logo{font-size:1rem;font-weight:800;letter-spacing:.08em;color:var(--cyan);text-shadow:var(--glow-c)}
+.logo em{color:var(--muted);font-style:normal}
+
+.hdr-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+
+.conn-status{
+  display:flex;align-items:center;gap:6px;
+  font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.conn-dot.live{background:var(--buy);animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.vps-input-wrap{display:flex;align-items:center;gap:6px}
+.vps-input-wrap label{font-size:.68rem;color:var(--muted)}
+#vps-url{
+  background:var(--s2);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:.72rem;padding:5px 10px;width:220px;outline:none;
+}
+#vps-url:focus{border-color:var(--accent)}
+#btn-connect{
+  background:var(--accent);color:#fff;border:none;border-radius:6px;
+  padding:5px 14px;font-size:.72rem;font-weight:700;cursor:pointer;
+  transition:opacity .2s;
+}
+#btn-connect:hover{opacity:.85}
+
+.time-display{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted)}
+
+/* ── LAYOUT ── */
+main{padding:20px 28px 48px;max-width:1600px;margin:0 auto}
+
+/* ── SYMBOL TABS ── */
+.sym-bar{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:18px;flex-wrap:wrap;
+}
+.sym-tab{
+  padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--s1);font-size:.72rem;cursor:pointer;
+  transition:all .2s;color:var(--muted);
+}
+.sym-tab:hover{border-color:var(--accent);color:var(--text)}
+.sym-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.sym-tab .dot{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--buy);margin-right:5px;
+}
+
+/* ── PRICE ROW ── */
+.price-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;margin-bottom:18px;
+}
+.pcard{
+  background:var(--s1);border:1px solid var(--border);border-radius:10px;
+  padding:12px 16px;transition:border-color .25s;
+}
+.pcard:hover{border-color:var(--accent)}
+.pcard .lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:4px}
+.pcard .val{font-family:'JetBrains Mono',monospace;font-size:1.15rem;color:var(--text)}
+.pcard .sub{font-size:.65rem;color:var(--muted);margin-top:2px}
+.sig-buy  .val{color:var(--buy);text-shadow:0 0 10px rgba(0,230,118,.4)}
+.sig-sell .val{color:var(--sell);text-shadow:0 0 10px rgba(255,61,90,.4)}
+.sig-neutral .val{color:var(--warn)}
+
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:1fr 380px;gap:18px;margin-bottom:18px}
+@media(max-width:1100px){.main-grid{grid-template-columns:1fr}}
+
+/* ── PANEL ── */
+.panel{
+  background:var(--s1);border:1px solid var(--border);border-radius:12px;
+  padding:18px 20px;
+}
+.panel-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.panel-title{
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;
+  color:var(--cyan);display:flex;align-items:center;gap:7px;
+}
+.panel-title::before{
+  content:'';width:3px;height:12px;background:var(--cyan);
+  border-radius:2px;box-shadow:0 0 6px var(--cyan);
+}
+
+/* ── CHART ── */
+canvas{display:block;width:100%}
+#main-canvas{height:320px}
+#equity-canvas{height:140px}
+
+/* ── MA OPTIMIZER ── */
+.opt-controls{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;
+}
+.opt-field label{font-size:.65rem;color:var(--muted);display:block;margin-bottom:3px}
+.opt-field input,
+.opt-field select{
+  width:100%;background:var(--s2);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;
+  font-size:.75rem;padding:6px 8px;outline:none;
+}
+.opt-field input:focus,
+.opt-field select:focus{border-color:var(--accent)}
+
+#btn-optimize{
+  width:100%;padding:9px;background:linear-gradient(135deg,var(--accent),var(--cyan));
+  color:#fff;border:none;border-radius:8px;font-weight:800;font-size:.82rem;
+  cursor:pointer;letter-spacing:.06em;transition:opacity .2s;margin-bottom:14px;
+}
+#btn-optimize:hover{opacity:.88}
+#btn-optimize:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── RESULTS TABLE ── */
+.results-wrap{overflow-x:auto;max-height:280px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.72rem}
+thead th{
+  position:sticky;top:0;background:var(--s2);
+  padding:7px 8px;text-align:left;
+  font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
+  border-bottom:1px solid var(--border);
+}
+tbody tr{border-bottom:1px solid rgba(28,42,69,.4);transition:background .15s}
+tbody tr:hover{background:rgba(61,126,255,.06)}
+tbody td{padding:7px 8px;font-family:'JetBrains Mono',monospace}
+tbody tr.best-row td{color:var(--buy)}
+tbody tr.best-row{background:rgba(0,230,118,.05);border-left:2px solid var(--buy)}
+
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.6rem;font-weight:700}
+.b-buy {background:rgba(0,230,118,.12);color:var(--buy)}
+.b-sell{background:rgba(255,61,90,.12); color:var(--sell)}
+.b-win {background:rgba(0,230,118,.1); color:var(--buy)}
+.b-loss{background:rgba(255,61,90,.1);  color:var(--sell)}
+.b-neu {background:rgba(255,179,0,.1);  color:var(--warn)}
+
+/* ── TRAILING VIZ ── */
+#trailing-canvas{height:180px}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.sbox{
+  background:var(--s1);border:1px solid var(--border);border-radius:10px;
+  padding:14px;text-align:center;
+}
+.sbox .sv{font-family:'JetBrains Mono',monospace;font-size:1.5rem;line-height:1;margin-bottom:3px}
+.sbox .sl{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.sv-buy{color:var(--buy)}.sv-sell{color:var(--sell)}.sv-acc{color:var(--accent)}
+
+/* ── POSITIONS / HISTORY ── */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:900px){.bottom-grid{grid-template-columns:1fr}}
+
+/* ── PROGRESS ── */
+.prog-wrap{height:4px;background:var(--border);border-radius:2px;margin-bottom:10px;overflow:hidden;display:none}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));border-radius:2px;transition:width .3s}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:24px;color:var(--muted);font-size:.78rem}
+
+/* ── NO CONNECTION ── */
+#no-conn{
+  display:flex;position:fixed;inset:0;z-index:300;
+  background:rgba(5,8,15,.95);
+  flex-direction:column;align-items:center;justify-content:center;gap:14px;
+}
+#no-conn h2{font-size:1.1rem;color:var(--cyan);letter-spacing:.08em}
+#no-conn p{font-size:.8rem;color:var(--muted);text-align:center;max-width:380px;line-height:1.7}
+#no-conn .nc-icon{font-size:2.5rem}
+</style>
+</head>
+<body>
+
+<div id="no-conn">
+  <div class="nc-icon">🔌</div>
+  <h2>VPS'e Bağlanılıyor</h2>
+  <p>
+    Yukarıdaki alana VPS IP adresinizi girin ve <strong>Bağlan</strong>'a tıklayın.<br>
+    MT5 EA'nın grafikte çalışıyor olması gerekir.
+  </p>
+</div>
+
+<header>
+  <div class="logo">EXPERT<em>MAMA</em> · STRATEGY LAB</div>
+  <div class="hdr-right">
+    <div class="vps-input-wrap">
+      <label>VPS:</label>
+      <input id="vps-url" type="text" placeholder="http://123.456.789.0:8765" value="">
+    </div>
+    <button id="btn-connect">Bağlan</button>
+    <div class="conn-status">
+      <div class="conn-dot" id="conn-dot"></div>
+      <span id="conn-label">Bağlı Değil</span>
+    </div>
+    <div class="time-display" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<main>
+  <!-- Sembol tabları -->
+  <div class="sym-bar" id="sym-bar">
+    <span style="font-size:.68rem;color:var(--muted)">Sembol:</span>
+  </div>
+
+  <!-- Fiyat kartları -->
+  <div class="price-row" id="price-row">
+    <div class="pcard"><div class="lbl">Sembol</div><div class="val mono" id="pc-sym">—</div></div>
+    <div class="pcard"><div class="lbl">BID</div><div class="val mono" id="pc-bid">—</div></div>
+    <div class="pcard"><div class="lbl">ASK</div><div class="val mono" id="pc-ask">—</div></div>
+    <div class="pcard"><div class="lbl">Spread</div><div class="val mono" id="pc-spread">—</div><div class="sub">puan</div></div>
+    <div class="pcard"><div class="lbl">Bakiye</div><div class="val mono" id="pc-bal">—</div></div>
+    <div class="pcard"><div class="lbl">Equity</div><div class="val mono" id="pc-eq">—</div></div>
+    <div class="pcard"><div class="lbl">Serbest Marjin</div><div class="val mono" id="pc-fm">—</div></div>
+    <div class="pcard" id="pc-sig-card"><div class="lbl">Sinyal</div><div class="val mono" id="pc-sig">—</div></div>
+  </div>
+
+  <!-- İstatistik -->
+  <div class="stats-grid">
+    <div class="sbox"><div class="sv sv-buy" id="st-wr">—%</div><div class="sl">Win Rate</div></div>
+    <div class="sbox"><div class="sv sv-acc" id="st-tr">—</div><div class="sl">Toplam İşlem</div></div>
+    <div class="sbox"><div class="sv" id="st-pnl">—</div><div class="sl">Toplam K/Z</div></div>
+  </div>
+
+  <!-- Ana grid: grafik + optimizer -->
+  <div class="main-grid">
+
+    <!-- Sol: Fiyat grafiği -->
+    <div>
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-hdr">
+          <div class="panel-title">Fiyat Grafiği + MA</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="tf-select" style="background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:.7rem">
+              <option value="M1">M1</option>
+              <option value="M5">M5</option>
+              <option value="M15" selected>M15</option>
+              <option value="H1">H1</option>
+              <option value="H4">H4</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="main-canvas"></canvas>
+      </div>
+
+      <!-- Trailing SL görselleştirme -->
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-hdr">
+          <div class="panel-title">Trailing SL Simülasyonu</div>
+          <select id="trail-type" style="background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 8px;font-size:.7rem">
+            <option value="ma">MA Bazlı</option>
+            <option value="atr">ATR Bazlı</option>
+            <option value="fixed">Sabit Puan</option>
+          </select>
+        </div>
+        <canvas id="trailing-canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- Sağ: MA Optimizer -->
+    <div>
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-hdr">
+          <div class="panel-title">MA Strateji Optimizer</div>
+        </div>
+
+        <div class="opt-controls">
+          <div class="opt-field">
+            <label>Hızlı MA Min</label>
+            <input type="number" id="fast-min" value="5" min="2" max="50">
+          </div>
+          <div class="opt-field">
+            <label>Hızlı MA Max</label>
+            <input type="number" id="fast-max" value="30" min="2" max="100">
+          </div>
+          <div class="opt-field">
+            <label>Yavaş MA Min</label>
+            <input type="number" id="slow-min" value="20" min="5" max="100">
+          </div>
+          <div class="opt-field">
+            <label>Yavaş MA Max</label>
+            <input type="number" id="slow-max" value="100" min="10" max="300">
+          </div>
+          <div class="opt-field">
+            <label>MA Türü</label>
+            <select id="ma-type">
+              <option value="SMA">SMA</option>
+              <option value="EMA" selected>EMA</option>
+              <option value="WMA">WMA</option>
+            </select>
+          </div>
+          <div class="opt-field">
+            <label>SL (puan)</label>
+            <input type="number" id="opt-sl" value="500" min="50">
+          </div>
+          <div class="opt-field">
+            <label>TP (puan)</label>
+            <input type="number" id="opt-tp" value="1000" min="50">
+          </div>
+          <div class="opt-field">
+            <label>Komisyon ($)</label>
+            <input type="number" id="opt-comm" value="3" min="0" step="0.5">
+          </div>
+        </div>
+
+        <div class="prog-wrap" id="prog-wrap">
+          <div class="prog-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+
+        <button id="btn-optimize">⚡ OPTİMİZE ET</button>
+
+        <div class="results-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Hızlı</th><th>Yavaş</th><th>W%</th>
+                <th>İşlem</th><th>Net K/Z</th><th>PF</th>
+              </tr>
+            </thead>
+            <tbody id="opt-tbody">
+              <tr><td colspan="6" class="empty">Önce bar verisi yükleyin, sonra optimize edin</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Equity -->
+      <div class="panel">
+        <div class="panel-title" style="margin-bottom:12px">Equity Eğrisi</div>
+        <canvas id="equity-canvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alt grid -->
+  <div class="bottom-grid">
+    <!-- Açık pozisyonlar -->
+    <div class="panel">
+      <div class="panel-title" style="margin-bottom:12px">Açık Pozisyonlar</div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Sembol</th><th>Yön</th><th>Lot</th>
+            <th>Açılış</th><th>Güncel</th><th>SL</th><th>TP</th><th>K/Z</th>
+          </tr></thead>
+          <tbody id="pos-tbody">
+            <tr><td colspan="8" class="empty">Açık pozisyon yok</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- İşlem geçmişi -->
+    <div class="panel">
+      <div class="panel-title" style="margin-bottom:12px">Son İşlemler</div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Ticket</th><th>Sembol</th><th>Yön</th>
+            <th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Zaman</th>
+          </tr></thead>
+          <tbody id="hist-tbody">
+            <tr><td colspan="7" class="empty">İşlem geçmişi yok</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let API_URL       = '';
+let connected     = false;
+let activeSymbol  = '';
+let allTicks      = {};
+let barCache      = {};   // symbol → bars[]
+let equityHist    = [];
+let openPos       = [];
+let tradeHist     = [];
+let pollTimer     = null;
+
+// ══════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════
+setInterval(() => {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('tr-TR');
+}, 1000);
+
+// ══════════════════════════════════════════════
+//  CONNECT
+// ══════════════════════════════════════════════
+document.getElementById('btn-connect').addEventListener('click', connect);
+document.getElementById('vps-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') connect();
+});
+
+async function connect() {
+  const raw = document.getElementById('vps-url').value.trim();
+  if (!raw) return;
+  API_URL = raw.replace(/\/$/, '');
+  try {
+    const r = await fetch(API_URL + '/health', { signal: AbortSignal.timeout(5000) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    setConnected(true);
+    document.getElementById('no-conn').style.display = 'none';
+    startPolling();
+  } catch(e) {
+    setConnected(false);
+    alert('Bağlantı hatası: ' + e.message + '\nVPS IP ve port\'u kontrol edin.');
+  }
+}
+
+function setConnected(v) {
+  connected = v;
+  document.getElementById('conn-dot').className   = 'conn-dot' + (v ? ' live' : '');
+  document.getElementById('conn-label').textContent = v ? 'CANLI' : 'Bağlı Değil';
+}
+
+// ══════════════════════════════════════════════
+//  POLLING
+// ══════════════════════════════════════════════
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  fetchAll();
+  pollTimer = setInterval(fetchAll, 3000);
+}
+
+async function fetchAll() {
+  if (!API_URL) return;
+  try {
+    const r = await fetch(API_URL + '/data', { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    setConnected(true);
+    processData(d);
+  } catch {
+    setConnected(false);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  DATA PROCESSING
+// ══════════════════════════════════════════════
+function processData(d) {
+  allTicks   = d.ticks || {};
+  equityHist = d.equity_history || [];
+  openPos    = d.open_positions || [];
+  tradeHist  = d.trade_history || [];
+
+  // Sembol tabları
+  const symbols = d.symbols || [];
+  renderSymbolTabs(symbols);
+
+  // İlk sembolü otomatik seç
+  if (!activeSymbol && symbols.length) {
+    activeSymbol = symbols[0];
+  }
+
+  if (activeSymbol) {
+    const tick = allTicks[activeSymbol];
+    if (tick) renderTick(tick);
+
+    // Bar verisini çek
+    fetchBars(activeSymbol);
+  }
+
+  renderStats();
+  renderPositions(openPos);
+  renderHistory(tradeHist);
+  drawEquity(equityHist);
+}
+
+async function fetchBars(symbol) {
+  if (!API_URL) return;
+  try {
+    const r = await fetch(API_URL + '/bars/' + symbol + '?limit=300');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.bars && d.bars.length) {
+      barCache[symbol] = d.bars;
+      drawMainChart(d.bars);
+      drawTrailing(d.bars);
+    }
+  } catch {}
+}
+
+// ══════════════════════════════════════════════
+//  SYMBOL TABS
+// ══════════════════════════════════════════════
+function renderSymbolTabs(symbols) {
+  const bar = document.getElementById('sym-bar');
+  // Mevcut tabları koru, yenilerini ekle
+  const existing = new Set([...bar.querySelectorAll('.sym-tab')].map(t => t.dataset.sym));
+  symbols.forEach(s => {
+    if (!existing.has(s)) {
+      const tab = document.createElement('div');
+      tab.className = 'sym-tab' + (s === activeSymbol ? ' active' : '');
+      tab.dataset.sym = s;
+      tab.innerHTML = `<span class="dot"></span>${s}`;
+      tab.addEventListener('click', () => {
+        activeSymbol = s;
+        document.querySelectorAll('.sym-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const tick = allTicks[s];
+        if (tick) renderTick(tick);
+        if (barCache[s]) { drawMainChart(barCache[s]); drawTrailing(barCache[s]); }
+        else fetchBars(s);
+      });
+      bar.appendChild(tab);
+    }
+  });
+  if (activeSymbol) {
+    document.querySelectorAll('.sym-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.sym === activeSymbol);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════
+//  TICK RENDER
+// ══════════════════════════════════════════════
+function renderTick(t) {
+  setText('pc-sym',   t.symbol);
+  setText('pc-bid',   n5(t.bid));
+  setText('pc-ask',   n5(t.ask));
+  setText('pc-spread',n1(t.spread));
+  setText('pc-bal',   n2(t.balance) + ' ' + (t.currency||''));
+  setText('pc-eq',    n2(t.equity));
+  setText('pc-fm',    n2(t.free_margin));
+
+  // Sinyal: bid vs son MA
+  const bars = barCache[t.symbol];
+  const sig = bars ? computeSignal(bars, 12) : 'NEUTRAL';
+  setText('pc-sig', sig);
+  const sc = document.getElementById('pc-sig-card');
+  sc.className = 'pcard sig-' + sig.toLowerCase();
+}
+
+// ══════════════════════════════════════════════
+//  MA HESAPLAMA
+// ══════════════════════════════════════════════
+function calcMA(closes, period, type='EMA') {
+  const result = new Array(closes.length).fill(null);
+  if (closes.length < period) return result;
+  if (type === 'SMA') {
+    for (let i = period-1; i < closes.length; i++) {
+      let s = 0;
+      for (let j = 0; j < period; j++) s += closes[i-j];
+      result[i] = s / period;
+    }
+  } else if (type === 'EMA') {
+    const k = 2 / (period + 1);
+    let ema = closes.slice(0, period).reduce((a,b)=>a+b,0) / period;
+    result[period-1] = ema;
+    for (let i = period; i < closes.length; i++) {
+      ema = closes[i] * k + ema * (1-k);
+      result[i] = ema;
+    }
+  } else if (type === 'WMA') {
+    const denom = period*(period+1)/2;
+    for (let i = period-1; i < closes.length; i++) {
+      let s = 0;
+      for (let j = 0; j < period; j++) s += closes[i-j] * (period-j);
+      result[i] = s / denom;
+    }
+  }
+  return result;
+}
+
+function computeSignal(bars, period, type='EMA') {
+  if (!bars || bars.length < period+2) return 'NEUTRAL';
+  const closes = bars.map(b=>b.c);
+  const ma = calcMA(closes, period, type);
+  const last = ma[ma.length-1];
+  const prev = ma[ma.length-2];
+  const price = closes[closes.length-1];
+  if (price > last && last > prev) return 'BUY';
+  if (price < last && last < prev) return 'SELL';
+  return 'NEUTRAL';
+}
+
+// ══════════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════════
+function renderStats() {
+  let wins=0, losses=0, totalPnl=0;
+  tradeHist.forEach(t => {
+    totalPnl += t.profit||0;
+    if ((t.profit||0) >= 0) wins++; else losses++;
+  });
+  const total = wins+losses;
+  const wr = total > 0 ? (wins/total*100).toFixed(1) : '0.0';
+  setText('st-wr', wr+'%');
+  setText('st-tr', total);
+  const pEl = document.getElementById('st-pnl');
+  pEl.textContent = (totalPnl>=0?'+':'')+n2(totalPnl);
+  pEl.className   = 'sv ' + (totalPnl>=0?'sv-buy':'sv-sell');
+}
+
+// ══════════════════════════════════════════════
+//  MAIN PRICE CHART + MA
+// ══════════════════════════════════════════════
+function drawMainChart(bars) {
+  const canvas = document.getElementById('main-canvas');
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight||320;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const fast = parseInt(document.getElementById('fast-min').value)||5;
+  const slow = parseInt(document.getElementById('slow-min').value)||20;
+  const maType = document.getElementById('ma-type').value;
+
+  const n    = Math.min(bars.length, 150);
+  const data = bars.slice(-n);
+  const closes = data.map(b=>b.c);
+  const maFast = calcMA(closes, fast, maType);
+  const maSlow = calcMA(closes, slow, maType);
+
+  const highs  = data.map(b=>b.h);
+  const lows   = data.map(b=>b.l);
+  const minV   = Math.min(...lows);
+  const maxV   = Math.max(...highs);
+  const range  = maxV - minV || 0.0001;
+
+  const pad  = {top:20, right:16, bottom:28, left:64};
+  const cW   = W - pad.left - pad.right;
+  const cH   = H - pad.top  - pad.bottom;
+  const barW = cW / n;
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle = 'rgba(28,42,69,.6)';
+  ctx.lineWidth = 1;
+  for (let i=0; i<=5; i++) {
+    const y = pad.top + (i/5)*cH;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cW,y); ctx.stroke();
+    const v = maxV - (i/5)*range;
+    ctx.fillStyle='#3d5070'; ctx.font='10px JetBrains Mono,monospace';
+    ctx.textAlign='right'; ctx.fillText(v.toFixed(5), pad.left-4, y+4);
+  }
+
+  // candles
+  data.forEach((b,i) => {
+    const x  = pad.left + i*barW + barW/2;
+    const yO = pad.top + (1-(b.o-minV)/range)*cH;
+    const yC = pad.top + (1-(b.c-minV)/range)*cH;
+    const yH = pad.top + (1-(b.h-minV)/range)*cH;
+    const yL = pad.top + (1-(b.l-minV)/range)*cH;
+    const bull = b.c >= b.o;
+    const color = bull ? '#00e676' : '#ff3d5a';
+
+    ctx.strokeStyle = color; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,yH); ctx.lineTo(x,yL); ctx.stroke();
+
+    const bodyH = Math.abs(yC-yO) || 1;
+    ctx.fillStyle = bull ? 'rgba(0,230,118,.7)' : 'rgba(255,61,90,.7)';
+    ctx.fillRect(x - barW*0.35, Math.min(yO,yC), barW*0.7, bodyH);
+  });
+
+  // MA fast
+  drawLine(ctx, maFast, data, n, pad, cW, cH, minV, range, '#3d7eff', 2);
+  // MA slow
+  drawLine(ctx, maSlow, data, n, pad, cW, cH, minV, range, '#ff9800', 1.5);
+
+  // Legend
+  ctx.font='11px JetBrains Mono,monospace'; ctx.textAlign='left';
+  ctx.fillStyle='#3d7eff'; ctx.fillText(`MA(${fast}) ${maType}`, pad.left+6, pad.top+14);
+  ctx.fillStyle='#ff9800'; ctx.fillText(`MA(${slow}) ${maType}`, pad.left+110, pad.top+14);
+}
+
+function drawLine(ctx, ma, data, n, pad, cW, cH, minV, range, color, lw) {
+  const barW = cW / n;
+  ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw;
+  ctx.shadowColor=color; ctx.shadowBlur=4;
+  let started=false;
+  ma.forEach((v,i) => {
+    if (v===null) return;
+    const x = pad.left + i*barW + barW/2;
+    const y = pad.top + (1-(v-minV)/range)*cH;
+    if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+  });
+  ctx.stroke(); ctx.shadowBlur=0;
+}
+
+// ══════════════════════════════════════════════
+//  TRAILING SL VİZÜELİ
+// ══════════════════════════════════════════════
+function drawTrailing(bars) {
+  const canvas = document.getElementById('trailing-canvas');
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight||180;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+
+  const trailType = document.getElementById('trail-type').value;
+  const n    = Math.min(bars.length, 100);
+  const data = bars.slice(-n);
+  const closes = data.map(b=>b.c);
+  const maV = calcMA(closes, 14, 'EMA');
+
+  // ATR hesapla
+  function calcATR(d, p=14) {
+    const tr = d.map((b,i) => {
+      if(i===0) return b.h-b.l;
+      return Math.max(b.h-b.l, Math.abs(b.h-d[i-1].c), Math.abs(b.l-d[i-1].c));
+    });
+    const atr = new Array(d.length).fill(null);
+    let sum=0;
+    for(let i=0;i<p;i++) sum+=tr[i];
+    atr[p-1]=sum/p;
+    for(let i=p;i<d.length;i++) atr[i]=(atr[i-1]*(p-1)+tr[i])/p;
+    return atr;
+  }
+  const atrV = calcATR(data);
+
+  // Trailing SL hesapla
+  const trailSL = new Array(n).fill(null);
+  const fixedPts = 0.0050; // 50 pip
+
+  for(let i=14;i<n;i++) {
+    if(trailType==='ma') {
+      trailSL[i] = maV[i] !== null ? maV[i] - (closes[i]-maV[i])*0.5 : null;
+    } else if(trailType==='atr') {
+      trailSL[i] = atrV[i] !== null ? closes[i] - atrV[i]*1.5 : null;
+    } else {
+      trailSL[i] = closes[i] - fixedPts;
+    }
+  }
+
+  const allVals = [...closes, ...trailSL.filter(v=>v!==null)];
+  const minV = Math.min(...allVals);
+  const maxV = Math.max(...allVals);
+  const range = maxV - minV || 0.0001;
+
+  const pad = {top:14, right:14, bottom:24, left:64};
+  const cW  = W - pad.left - pad.right;
+  const cH  = H - pad.top  - pad.bottom;
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle='rgba(28,42,69,.5)'; ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){
+    const y=pad.top+(i/3)*cH;
+    ctx.beginPath(); ctx.moveTo(pad.left,y); ctx.lineTo(pad.left+cW,y); ctx.stroke();
+    const v=maxV-(i/3)*range;
+    ctx.fillStyle='#3d5070';ctx.font='9px JetBrains Mono,monospace';
+    ctx.textAlign='right'; ctx.fillText(v.toFixed(5),pad.left-3,y+3);
+  }
+
+  // Fiyat çizgisi
+  ctx.beginPath(); ctx.strokeStyle='rgba(200,216,240,.5)'; ctx.lineWidth=1.5;
+  closes.forEach((c,i)=>{
+    const x=pad.left+(i/n)*cW;
+    const y=pad.top+(1-(c-minV)/range)*cH;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Trailing SL çizgisi
+  ctx.beginPath(); ctx.strokeStyle='#ff3d5a'; ctx.lineWidth=1.5;
+  ctx.setLineDash([4,3]);
+  ctx.shadowColor='#ff3d5a'; ctx.shadowBlur=6;
+  let started=false;
+  trailSL.forEach((v,i)=>{
+    if(v===null) return;
+    const x=pad.left+(i/n)*cW;
+    const y=pad.top+(1-(v-minV)/range)*cH;
+    if(!started){ctx.moveTo(x,y);started=true;} else ctx.lineTo(x,y);
+  });
+  ctx.stroke(); ctx.setLineDash([]); ctx.shadowBlur=0;
+
+  // Alan dolgusu (fiyat - SL arası)
+  ctx.beginPath();
+  closes.forEach((c,i)=>{
+    if(trailSL[i]===null) return;
+    const x=pad.left+(i/n)*cW;
+    const yP=pad.top+(1-(c-minV)/range)*cH;
+    i===0||trailSL[i-1]===null?ctx.moveTo(x,yP):ctx.lineTo(x,yP);
+  });
+  for(let i=n-1;i>=0;i--){
+    if(trailSL[i]===null) continue;
+    const x=pad.left+(i/n)*cW;
+    const yS=pad.top+(1-(trailSL[i]-minV)/range)*cH;
+    ctx.lineTo(x,yS);
+  }
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,61,90,.07)'; ctx.fill();
+
+  // Legend
+  ctx.font='10px JetBrains Mono,monospace'; ctx.textAlign='left';
+  ctx.fillStyle='rgba(200,216,240,.6)'; ctx.fillText('Fiyat', pad.left+4, pad.top+12);
+  ctx.fillStyle='#ff3d5a';
+  const label = trailType==='ma'?'MA Trailing SL': trailType==='atr'?'ATR Trailing SL':'Fixed Trailing SL';
+  ctx.fillText(label, pad.left+50, pad.top+12);
+}
+
+// ══════════════════════════════════════════════
+//  MA OPTIMIZER — Backtest Motoru
+// ══════════════════════════════════════════════
+document.getElementById('btn-optimize').addEventListener('click', runOptimize);
+document.getElementById('trail-type').addEventListener('change', () => {
+  if (activeSymbol && barCache[activeSymbol]) drawTrailing(barCache[activeSymbol]);
+});
+
+async function runOptimize() {
+  const bars = barCache[activeSymbol];
+  if (!bars || bars.length < 50) {
+    alert('Yeterli bar verisi yok. Önce bağlanın ve bekleyin.'); return;
+  }
+
+  const fastMin  = parseInt(document.getElementById('fast-min').value);
+  const fastMax  = parseInt(document.getElementById('fast-max').value);
+  const slowMin  = parseInt(document.getElementById('slow-min').value);
+  const slowMax  = parseInt(document.getElementById('slow-max').value);
+  const maType   = document.getElementById('ma-type').value;
+  const sl       = parseInt(document.getElementById('opt-sl').value);
+  const tp       = parseInt(document.getElementById('opt-tp').value);
+  const comm     = parseFloat(document.getElementById('opt-comm').value);
+
+  const btn = document.getElementById('btn-optimize');
+  btn.disabled = true; btn.textContent = 'Hesaplanıyor...';
+
+  const progWrap = document.getElementById('prog-wrap');
+  const progFill = document.getElementById('prog-fill');
+  progWrap.style.display = 'block';
+
+  const closes   = bars.map(b=>b.c);
+  const point    = closes[0] < 10 ? 0.00001 : closes[0] < 200 ? 0.001 : 0.01;
+  const results  = [];
+
+  const combos = [];
+  for (let f=fastMin; f<=fastMax; f++) {
+    for (let s=slowMin; s<=slowMax; s++) {
+      if (s <= f) continue;
+      combos.push([f,s]);
+    }
+  }
+
+  let done = 0;
+  const CHUNK = 20;
+
+  async function processChunk(start) {
+    for (let ci=start; ci<Math.min(start+CHUNK, combos.length); ci++) {
+      const [f, s] = combos[ci];
+      const r = backtest(closes, f, s, maType, sl, tp, comm, point);
+      if (r.trades >= 3) results.push({fast:f, slow:s, ...r});
+      done++;
+    }
+    progFill.style.width = (done/combos.length*100).toFixed(1)+'%';
+    if (done < combos.length) {
+      await new Promise(res => setTimeout(res, 0));
+      await processChunk(start+CHUNK);
+    }
+  }
+
+  await processChunk(0);
+
+  // Profit factor'a göre sırala
+  results.sort((a,b) => b.pf - a.pf);
+  renderOptResults(results.slice(0, 50));
+
+  btn.disabled=false; btn.textContent='⚡ OPTİMİZE ET';
+  progWrap.style.display='none';
+}
+
+// ── Backtest fonksiyonu ──
+function backtest(closes, fastP, slowP, maType, slPts, tpPts, comm, point) {
+  const maFast = calcMA(closes, fastP, maType);
+  const maSlow = calcMA(closes, slowP, maType);
+
+  let trades=0, wins=0, totalProfit=0, grossWin=0, grossLoss=0;
+  let inTrade=false, tradeDir=0, entryPrice=0;
+
+  for (let i=slowP+1; i<closes.length; i++) {
+    if (maFast[i]===null||maSlow[i]===null) continue;
+
+    const crossUp   = maFast[i]>maSlow[i] && maFast[i-1]<=maSlow[i-1];
+    const crossDown = maFast[i]<maSlow[i] && maFast[i-1]>=maSlow[i-1];
+
+    if (!inTrade) {
+      if (crossUp)   { inTrade=true; tradeDir= 1; entryPrice=closes[i]; }
+      if (crossDown) { inTrade=true; tradeDir=-1; entryPrice=closes[i]; }
+    } else {
+      const price  = closes[i];
+      const diff   = (price - entryPrice) * tradeDir / point;
+      const sl_hit = diff <= -slPts;
+      const tp_hit = diff >= tpPts;
+      const exit   = crossUp && tradeDir===-1 || crossDown && tradeDir===1;
+
+      if (sl_hit || tp_hit || exit) {
+        const pnl = diff * point * 100000 - comm*2; // pip değeri tahmin
+        totalProfit += pnl;
+        if (pnl > 0) { wins++; grossWin += pnl; } else { grossLoss += Math.abs(pnl); }
+        trades++;
+        inTrade=false;
+
+        // Hemen yeni işlem
+        if (crossUp)   { inTrade=true; tradeDir= 1; entryPrice=closes[i]; }
+        if (crossDown) { inTrade=true; tradeDir=-1; entryPrice=closes[i]; }
+      }
+    }
+  }
+
+  const wr = trades>0 ? (wins/trades*100) : 0;
+  const pf = grossLoss>0 ? grossWin/grossLoss : (grossWin>0?999:0);
+  return { trades, wins, wr, pf, profit: totalProfit };
+}
+
+function renderOptResults(results) {
+  const tbody = document.getElementById('opt-tbody');
+  if (!results.length) {
+    tbody.innerHTML='<tr><td colspan="6" class="empty">Sonuç bulunamadı</td></tr>';
+    return;
+  }
+  tbody.innerHTML = results.map((r,i) => `
+    <tr class="${i===0?'best-row':''}">
+      <td>${r.fast}</td>
+      <td>${r.slow}</td>
+      <td>${r.wr.toFixed(1)}%</td>
+      <td>${r.trades}</td>
+      <td class="${r.profit>=0?'':'sv-sell'}">${r.profit>=0?'+':''}${r.profit.toFixed(0)}</td>
+      <td>${r.pf===999?'∞':r.pf.toFixed(2)}</td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+//  EQUITY CHART
+// ══════════════════════════════════════════════
+function drawEquity(hist) {
+  if (!hist.length) return;
+  const canvas = document.getElementById('equity-canvas');
+  const dpr = window.devicePixelRatio||1;
+  const W = canvas.offsetWidth, H = canvas.offsetHeight||140;
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  const ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+
+  const vals  = hist.map(p=>p.v);
+  const minV  = Math.min(...vals);
+  const maxV  = Math.max(...vals);
+  const range = maxV-minV||1;
+  const n     = hist.length;
+  const pad   = {top:10,right:12,bottom:20,left:56};
+  const cW    = W-pad.left-pad.right;
+  const cH    = H-pad.top-pad.bottom;
+
+  ctx.clearRect(0,0,W,H);
+
+  // grid
+  ctx.strokeStyle='rgba(28,42,69,.5)'; ctx.lineWidth=1;
+  for(let i=0;i<=3;i++){
+    const y=pad.top+(i/3)*cH;
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(pad.left+cW,y);ctx.stroke();
+    const v=maxV-(i/3)*range;
+    ctx.fillStyle='#3d5070';ctx.font='9px JetBrains Mono,monospace';
+    ctx.textAlign='right';ctx.fillText(v.toFixed(0),pad.left-3,y+3);
+  }
+
+  // gradient
+  const grad=ctx.createLinearGradient(0,pad.top,0,pad.top+cH);
+  grad.addColorStop(0,'rgba(61,126,255,.2)');
+  grad.addColorStop(1,'rgba(61,126,255,0)');
+  ctx.beginPath();
+  hist.forEach((p,i)=>{
+    const x=pad.left+(i/(n-1||1))*cW;
+    const y=pad.top+(1-(p.v-minV)/range)*cH;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.lineTo(pad.left+cW,pad.top+cH);ctx.lineTo(pad.left,pad.top+cH);
+  ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+
+  // line
+  ctx.beginPath();ctx.strokeStyle='#3d7eff';ctx.lineWidth=2;
+  ctx.shadowColor='#3d7eff';ctx.shadowBlur=6;
+  hist.forEach((p,i)=>{
+    const x=pad.left+(i/(n-1||1))*cW;
+    const y=pad.top+(1-(p.v-minV)/range)*cH;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();ctx.shadowBlur=0;
+
+  // last dot
+  const lp=hist[n-1];
+  const lx=pad.left+cW;
+  const ly=pad.top+(1-(lp.v-minV)/range)*cH;
+  ctx.beginPath();ctx.arc(lx,ly,4,0,Math.PI*2);
+  ctx.fillStyle='#3d7eff';ctx.shadowColor='#3d7eff';ctx.shadowBlur=10;ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+// ══════════════════════════════════════════════
+//  POSITIONS & HISTORY TABLES
+// ══════════════════════════════════════════════
+function renderPositions(pos) {
+  const tbody=document.getElementById('pos-tbody');
+  if(!pos.length){tbody.innerHTML='<tr><td colspan="8" class="empty">Açık pozisyon yok</td></tr>';return;}
+  tbody.innerHTML=pos.map(p=>{
+    const pc=p.profit>=0?'sv-buy':'sv-sell';
+    const sign=p.profit>=0?'+':'';
+    return`<tr>
+      <td>${p.symbol}</td>
+      <td><span class="badge b-${p.direction.toLowerCase()}">${p.direction}</span></td>
+      <td>${n2(p.volume)}</td>
+      <td>${n5(p.open_price)}</td>
+      <td>${n5(p.current_price)}</td>
+      <td>${p.sl?n5(p.sl):'—'}</td>
+      <td>${p.tp?n5(p.tp):'—'}</td>
+      <td class="${pc}">${sign}${n2(p.profit)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHistory(hist) {
+  const tbody=document.getElementById('hist-tbody');
+  if(!hist.length){tbody.innerHTML='<tr><td colspan="7" class="empty">İşlem geçmişi yok</td></tr>';return;}
+  tbody.innerHTML=hist.slice(0,40).map(t=>{
+    const pc=t.profit>=0?'sv-buy':'sv-sell';
+    const sign=t.profit>=0?'+':'';
+    const dt=new Date(t.time*1000).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    return`<tr>
+      <td>${t.ticket}</td>
+      <td>${t.symbol}</td>
+      <td><span class="badge b-${t.direction.toLowerCase()}">${t.direction}</span></td>
+      <td>${n2(t.volume)}</td>
+      <td class="${pc}">${sign}${n2(t.profit)}</td>
+      <td><span class="badge b-${t.result.toLowerCase()}">${t.result}</span></td>
+      <td style="color:var(--muted);font-size:.68rem">${dt}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
+function n5(v){return Number(v).toFixed(5)}
+function n2(v){return Number(v).toFixed(2)}
+function n1(v){return Number(v).toFixed(1)}
+
+window.addEventListener('resize',()=>{
+  if(activeSymbol&&barCache[activeSymbol]){
+    drawMainChart(barCache[activeSymbol]);
+    drawTrailing(barCache[activeSymbol]);
+  }
+  drawEquity(equityHist);
+});
+</script>
+</body>
+</html>
