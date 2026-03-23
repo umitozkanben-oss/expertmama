@@ -7,122 +7,125 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f8fafc;--s1:#fff;--s2:#f1f5f9;--border:#e2e8f0;--accent:#2563eb;--buy:#16a34a;--sell:#dc2626;--warn:#d97706;--text:#0f172a;--muted:#64748b;--light:#94a3b8}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px}
+:root{--bg:#f1f5f9;--s1:#fff;--s2:#f8fafc;--border:#e2e8f0;--accent:#2563eb;--buy:#16a34a;--sell:#dc2626;--warn:#d97706;--text:#0f172a;--muted:#64748b;--light:#94a3b8}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px}
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
 
 /* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
-.logo{font-weight:700;font-size:15px;color:var(--accent)}.logo span{color:var(--light);font-weight:400}
-.hdr-r{display:flex;align-items:center;gap:10px}
-#vps-url{border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 10px;width:200px;outline:none}
-#vps-url:focus{border-color:var(--accent)}
-#btn-conn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer}
-.dot{width:7px;height:7px;border-radius:50%;background:#cbd5e1}.dot.on{background:var(--buy);animation:pulse 1.5s infinite}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;gap:12px}
+.logo{font-weight:700;font-size:14px;color:var(--accent);white-space:nowrap}.logo span{color:var(--light);font-weight:400}
+.hdr-mid{display:flex;gap:6px;flex-wrap:wrap;flex:1;justify-content:center}
+.sym-tab{padding:3px 10px;border-radius:12px;border:1px solid var(--border);background:var(--s2);font-size:11px;cursor:pointer;color:var(--muted);white-space:nowrap;transition:all .15s}
+.sym-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.hdr-r{display:flex;align-items:center;gap:8px;white-space:nowrap}
+#vps-url{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 8px;width:180px;outline:none}
+#btn-conn{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer}
+.dot{width:6px;height:6px;border-radius:50%;background:#cbd5e1;flex-shrink:0}.dot.on{background:var(--buy);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+.clock{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
 
 /* MAIN */
-main{padding:20px 24px 40px;max-width:1600px;margin:0 auto}
+main{padding:12px 20px 32px}
 
-/* SYMBOL TABS */
-.sym-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-.sym-tab{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted)}
-.sym-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-
-/* PRICE CARDS */
-.price-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
-.pc{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px}
-.pc .lbl{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
-.pc .val{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:var(--text)}
+/* PRICE ROW */
+.price-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.pc{background:#fff;border:1px solid var(--border);border-radius:7px;padding:8px 12px;min-width:110px;flex:1}
+.pc .lbl{font-size:10px;color:var(--muted);margin-bottom:3px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.pc .val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--text)}
 .pc.buy .val{color:var(--buy)}.pc.sell .val{color:var(--sell)}.pc.warn .val{color:var(--warn)}
 
-/* DATE FILTER */
-.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filter-btn{padding:5px 14px;border-radius:16px;border:1px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s}
-.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-.date-range{display:flex;align-items:center;gap:6px}
-.date-range input{border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);font-size:12px;padding:4px 8px;outline:none}
-.date-range input:focus{border-color:var(--accent)}
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar label{font-size:11px;color:var(--muted);font-weight:500}
+.fbtn{padding:4px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:11px;cursor:pointer;color:var(--muted)}
+.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.date-range{display:none;align-items:center;gap:4px}
+.date-range input{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-size:11px;padding:3px 6px;outline:none}
 
-/* STAT CARDS */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-@media(max-width:800px){.stat-row{grid-template-columns:repeat(2,1fr)}}
-.sc{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
-.sc .sv{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;margin-bottom:2px}
-.sc .sl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.sv-buy{color:var(--buy)}.sv-sell{color:var(--sell)}.sv-acc{color:var(--accent)}.sv-warn{color:var(--warn)}
+/* STATS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.sc{background:#fff;border:1px solid var(--border);border-radius:7px;padding:10px;text-align:center}
+.sc .sv{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;margin-bottom:1px}
+.sc .sl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.sv-buy{color:var(--buy)}.sv-sell{color:var(--sell)}.sv-acc{color:var(--accent)}
 
-/* WIN/LOSS BAR */
-.wl-panel{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px}
-.wl-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
-.wl-track{height:6px;background:var(--s2);border-radius:3px;overflow:hidden}
+/* WIN BAR */
+.wl-panel{background:#fff;border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:12px}
+.wl-head{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
+.wl-track{height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
 .wl-fill{height:100%;background:var(--buy);border-radius:3px;transition:width .5s}
 
-/* MAIN GRID */
-.grid2{display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px}
-@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+/* CHART AREA */
+.chart-wrap{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.chart-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.chart-controls{display:flex;align-items:center;gap:8px}
+.sig-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:var(--s2);color:var(--muted)}
+.sig-badge.buy{background:#dcfce7;color:#15803d}
+.sig-badge.sell{background:#fee2e2;color:#dc2626}
+.sig-badge.cross-buy{background:#bbf7d0;color:#15803d;animation:glow-buy .8s ease-in-out infinite alternate}
+.sig-badge.cross-sell{background:#fecaca;color:#dc2626;animation:glow-sell .8s ease-in-out infinite alternate}
+@keyframes glow-buy{from{box-shadow:0 0 0 rgba(22,163,74,0)}to{box-shadow:0 0 8px rgba(22,163,74,.4)}}
+@keyframes glow-sell{from{box-shadow:0 0 0 rgba(220,38,38,0)}to{box-shadow:0 0 8px rgba(220,38,38,.4)}}
+select{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-size:11px;padding:3px 7px;outline:none}
+canvas{display:block;width:100%}
+#main-canvas{height:360px}
+
+/* BOTTOM GRID */
+.bottom-grid{display:grid;grid-template-columns:420px 1fr 1fr;gap:12px}
+@media(max-width:1200px){.bottom-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:800px){.bottom-grid{grid-template-columns:1fr}}
 
 /* PANEL */
-.panel{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px}
-.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.pt{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
-select{border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-size:12px;padding:4px 8px;outline:none}
-
-/* CHART */
-canvas{display:block;width:100%}
-#main-canvas{height:340px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.pt{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:10px}
 
 /* OPTIMIZER */
-.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.of label{font-size:11px;color:var(--muted);display:block;margin-bottom:2px;font-weight:500}
-.of input,.of select{width:100%;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 8px;outline:none}
-.opt-note{font-size:11px;color:var(--muted);margin-bottom:8px;padding:6px 8px;background:var(--s2);border-radius:5px;line-height:1.5}
-.best-result{font-size:12px;padding:8px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;color:var(--buy);font-weight:600;margin-bottom:8px;display:none}
-#btn-opt{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-weight:600;font-size:13px;cursor:pointer;margin-bottom:10px}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
+.of label{font-size:10px;color:var(--muted);display:block;margin-bottom:2px;font-weight:500}
+.of input,.of select{width:100%;border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:4px 7px;outline:none}
+.opt-note{font-size:10px;color:var(--muted);margin-bottom:6px;padding:5px 7px;background:var(--s2);border-radius:4px}
+.best-result{font-size:11px;padding:6px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;color:var(--buy);font-weight:600;margin-bottom:6px;display:none}
+#btn-opt{width:100%;padding:7px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-weight:600;font-size:12px;cursor:pointer;margin-bottom:8px}
 #btn-opt:disabled{opacity:.4;cursor:not-allowed}
-.prog{height:3px;background:var(--s2);border-radius:2px;margin-bottom:8px;display:none}
+.prog{height:3px;background:var(--s2);border-radius:2px;margin-bottom:6px;display:none}
 .prog-f{height:100%;background:var(--accent);border-radius:2px;transition:width .2s}
 
 /* TABLES */
-.tbl-wrap{overflow-x:auto;max-height:280px;overflow-y:auto}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{position:sticky;top:0;background:#f8fafc;padding:6px 8px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
+.tbl-wrap{overflow-x:auto;max-height:240px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{position:sticky;top:0;background:#f8fafc;padding:5px 7px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
 tbody tr{border-bottom:1px solid #f1f5f9}tbody tr:hover{background:#f8fafc}
-tbody td{padding:7px 8px;font-family:'JetBrains Mono',monospace}
-tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
-.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+tbody td{padding:6px 7px;font-family:'JetBrains Mono',monospace}
+tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600}
 .b-buy{background:#dcfce7;color:#15803d}.b-sell{background:#fee2e2;color:#dc2626}
 .b-win{background:#dcfce7;color:#15803d}.b-loss{background:#fee2e2;color:#dc2626}
 .pnl-p{color:var(--buy);font-weight:600}.pnl-n{color:var(--sell);font-weight:600}
-.empty{text-align:center;padding:20px;color:var(--light);font-size:12px}
-
-/* BOTTOM */
-.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:900px){.bottom-grid{grid-template-columns:1fr}}
+.empty{text-align:center;padding:16px;color:var(--light);font-size:11px}
 
 /* NO CONN */
-#no-conn{display:flex;position:fixed;inset:0;z-index:300;background:rgba(248,250,252,.97);flex-direction:column;align-items:center;justify-content:center;gap:16px}
-#no-conn h2{font-size:18px;font-weight:700;color:var(--accent)}
-#no-conn p{font-size:13px;color:var(--muted);text-align:center;max-width:360px;line-height:1.7}
-.nc-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:24px 32px;display:flex;flex-direction:column;gap:12px;min-width:340px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-.nc-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
-.nc-row{display:flex;gap:8px}
-.nc-row input{flex:1;border:1px solid var(--border);border-radius:6px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 12px;outline:none}
+#no-conn{display:flex;position:fixed;inset:0;z-index:300;background:rgba(241,245,249,.97);flex-direction:column;align-items:center;justify-content:center;gap:14px}
+#no-conn h2{font-size:17px;font-weight:700;color:var(--accent)}
+#no-conn p{font-size:12px;color:var(--muted);text-align:center;max-width:340px;line-height:1.7}
+.nc-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:22px 28px;display:flex;flex-direction:column;gap:10px;min-width:320px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+.nc-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.nc-row{display:flex;gap:7px}
+.nc-row input{flex:1;border:1px solid var(--border);border-radius:5px;background:var(--s2);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 10px;outline:none}
 .nc-row input:focus{border-color:var(--accent)}
-.nc-row button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer}
+.nc-row button{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
 
 <div id="no-conn">
-  <div style="font-size:40px">📡</div>
+  <div style="font-size:36px">📡</div>
   <h2>ExpertMAMA Dashboard</h2>
   <p>VPS adresini gir ve bağlan.<br>MT5 Bridge EA'nın grafikte çalışıyor olması gerekir.</p>
   <div class="nc-box">
     <div class="nc-lbl">VPS API Adresi</div>
     <div class="nc-row">
-      <input id="vps-ov" type="text" value="http://94.250.203.232:8765">
+      <input id="vps-ov" value="http://94.250.203.232:8765">
       <button id="btn-conn-ov">Bağlan</button>
     </div>
   </div>
@@ -130,8 +133,9 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
 
 <header>
   <div class="logo">ExpertMAMA <span>· Dashboard</span></div>
+  <div class="hdr-mid" id="sym-bar"></div>
   <div class="hdr-r">
-    <input id="vps-url" type="text" value="http://94.250.203.232:8765">
+    <input id="vps-url" value="http://94.250.203.232:8765">
     <button id="btn-conn">Bağlan</button>
     <div class="dot" id="conn-dot"></div>
     <div class="clock" id="clock">--:--:--</div>
@@ -139,11 +143,6 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
 </header>
 
 <main>
-  <!-- Sembol tabları -->
-  <div class="sym-bar" id="sym-bar">
-    <span style="font-size:11px;color:var(--muted);font-weight:500">Sembol:</span>
-  </div>
-
   <!-- Fiyat kartları -->
   <div class="price-row">
     <div class="pc"><div class="lbl">Sembol</div><div class="val" id="p-sym">—</div></div>
@@ -156,17 +155,17 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
     <div class="pc" id="p-sig-card"><div class="lbl">Sinyal</div><div class="val" id="p-sig">—</div></div>
   </div>
 
-  <!-- Tarih filtresi -->
+  <!-- Filtre -->
   <div class="filter-bar">
-    <span style="font-size:11px;color:var(--muted);font-weight:500">Dönem:</span>
-    <div class="filter-btn active" data-f="today">Bugün</div>
-    <div class="filter-btn" data-f="week">Bu Hafta</div>
-    <div class="filter-btn" data-f="month">Bu Ay</div>
-    <div class="filter-btn" data-f="all">Tümü</div>
-    <div class="filter-btn" data-f="custom">Özel</div>
-    <div class="date-range" id="date-range" style="display:none">
+    <label>Dönem:</label>
+    <div class="fbtn active" data-f="today">Bugün</div>
+    <div class="fbtn" data-f="week">Bu Hafta</div>
+    <div class="fbtn" data-f="month">Bu Ay</div>
+    <div class="fbtn" data-f="all">Tümü</div>
+    <div class="fbtn" data-f="custom">Özel</div>
+    <div class="date-range" id="date-range">
       <input type="date" id="date-from">
-      <span style="color:var(--muted);font-size:12px">—</span>
+      <span style="color:var(--muted)">—</span>
       <input type="date" id="date-to">
     </div>
   </div>
@@ -176,7 +175,7 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
     <div class="sc"><div class="sv sv-buy" id="st-wr">—</div><div class="sl">Win Rate</div></div>
     <div class="sc"><div class="sv sv-acc" id="st-tr">—</div><div class="sl">İşlem</div></div>
     <div class="sc"><div class="sv" id="st-pnl">—</div><div class="sl">K/Z</div></div>
-    <div class="sc"><div class="sv sv-warn" id="st-avg">—</div><div class="sl">Ort. K/Z</div></div>
+    <div class="sc"><div class="sv" id="st-avg">—</div><div class="sl">Ort. K/Z</div></div>
   </div>
 
   <div class="wl-panel">
@@ -184,28 +183,29 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
     <div class="wl-track"><div class="wl-fill" id="wl-fill" style="width:0%"></div></div>
   </div>
 
-  <!-- Ana grid -->
-  <div class="grid2">
-    <!-- Sol: grafik -->
-    <div class="panel">
-      <div class="ph">
-        <div class="pt">Fiyat Grafiği + MA</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div id="chart-sig" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;background:var(--s2);color:var(--muted)">—</div>
-          <select id="tf-sel">
-            <option value="M5">M5</option>
-            <option value="M15" selected>M15</option>
-            <option value="H1">H1</option>
-            <option value="H4">H4</option>
-          </select>
-        </div>
+  <!-- Grafik -->
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div class="chart-title">Fiyat Grafiği + MA</div>
+      <div class="chart-controls">
+        <div class="sig-badge" id="chart-sig">—</div>
+        <select id="tf-sel">
+          <option value="M5">M5</option>
+          <option value="M15" selected>M15</option>
+          <option value="H1">H1</option>
+          <option value="H4">H4</option>
+        </select>
       </div>
-      <canvas id="main-canvas"></canvas>
     </div>
+    <canvas id="main-canvas"></canvas>
+  </div>
 
-    <!-- Sağ: optimizer -->
+  <!-- Alt grid: optimizer + pozisyonlar + işlemler -->
+  <div class="bottom-grid">
+
+    <!-- Optimizer -->
     <div class="panel">
-      <div class="ph"><div class="pt">MA Optimizer</div></div>
+      <div class="pt">MA Optimizer</div>
       <div class="opt-grid">
         <div class="of"><label>Hızlı Min</label><input type="number" id="f-min" value="5"></div>
         <div class="of"><label>Hızlı Max</label><input type="number" id="f-max" value="30"></div>
@@ -215,8 +215,8 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
           <select id="ma-type"><option value="SMA">SMA</option><option value="EMA" selected>EMA</option><option value="WMA">WMA</option></select>
         </div>
         <div class="of"><label>Lot</label><input type="number" id="o-lot" value="0.1" step="0.01"></div>
-        <div class="of"><label>SL (puan)</label><input type="number" id="o-sl" value="500"></div>
-        <div class="of"><label>TP (puan)</label><input type="number" id="o-tp" value="1000"></div>
+        <div class="of"><label>SL (pip)</label><input type="number" id="o-sl" value="50"></div>
+        <div class="of"><label>TP (pip)</label><input type="number" id="o-tp" value="100"></div>
       </div>
       <div class="opt-note" id="opt-note">TF seç, bağlan, optimize et</div>
       <div class="best-result" id="best-result"></div>
@@ -229,12 +229,10 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
         </table>
       </div>
     </div>
-  </div>
 
-  <!-- Alt: tablolar -->
-  <div class="bottom-grid">
+    <!-- Açık pozisyonlar -->
     <div class="panel">
-      <div class="pt" style="margin-bottom:10px">Açık Pozisyonlar</div>
+      <div class="pt">Açık Pozisyonlar</div>
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>Sembol</th><th>Yön</th><th>Lot</th><th>Açılış</th><th>Güncel</th><th>SL</th><th>TP</th><th>K/Z</th></tr></thead>
@@ -242,8 +240,10 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
         </table>
       </div>
     </div>
+
+    <!-- İşlem geçmişi -->
     <div class="panel">
-      <div class="pt" style="margin-bottom:10px" id="hist-title">İşlemler</div>
+      <div class="pt" id="hist-title">Bugünün İşlemleri</div>
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>Ticket</th><th>Sembol</th><th>Yön</th><th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Tarih</th></tr></thead>
@@ -255,15 +255,12 @@ tr.best td{color:var(--buy);font-weight:600}tr.best{background:#f0fdf4}
 </main>
 
 <script>
-// ── STATE ──
 let API='', activeSym='', allTicks={}, barCache={}, positions=[], history=[];
 let activeFilter='today', dateFrom='', dateTo='';
-let bestMA = { fast: 12, slow: 26, type: 'EMA' }; // optimizer güncelleyecek
+let bestMA={fast:12,slow:26,type:'EMA'};
 
-// ── CLOCK ──
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('tr-TR');},1000);
 
-// ── CONNECT ──
 function connect(){
   const v=document.getElementById('vps-ov')?.value.trim()||document.getElementById('vps-url').value.trim();
   if(!v)return; API=v.replace(/\/$/,'');
@@ -277,7 +274,6 @@ document.getElementById('btn-conn-ov').onclick=connect;
 ['vps-url','vps-ov'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>e.key==='Enter'&&connect()));
 function setConn(v){document.getElementById('conn-dot').className='dot'+(v?' on':'');}
 
-// ── POLLING ──
 let pollTimer=null;
 function startPoll(){if(pollTimer)clearInterval(pollTimer);fetchAll();pollTimer=setInterval(fetchAll,3000);}
 
@@ -286,12 +282,12 @@ async function fetchAll(){
   try{
     const r=await fetch(API+'/data',{signal:AbortSignal.timeout(8000)});
     if(!r.ok)throw 0;
-    const d=await r.json(); setConn(true);
-    allTicks=d.ticks||{}; positions=d.open_positions||{}; history=d.trade_history||[];
+    const d=await r.json();setConn(true);
+    allTicks=d.ticks||{};positions=d.open_positions||[];history=d.trade_history||[];
     renderSymTabs(d.symbols||[]);
-    if(!activeSym&&(d.symbols||[]).length) activeSym=d.symbols[0];
+    if(!activeSym&&(d.symbols||[]).length)activeSym=d.symbols[0];
     if(activeSym){renderTick(allTicks[activeSym]);fetchBars(activeSym);}
-    renderStats(); renderPositions(positions); renderHistory(history);
+    renderStats();renderPositions(positions);renderHistory(history);
   }catch{setConn(false);}
 }
 
@@ -305,17 +301,13 @@ async function fetchBars(sym){
     if(d.bars?.length){
       barCache[sym+'_'+tf]=d.bars;
       drawMain(d.bars);
-      updateOptNote(d.bars.length);
+      updateSig(d.bars);
+      document.getElementById('opt-note').textContent=`${tf} · ${d.bars.length} bar · SL/TP pip cinsinden · ${document.getElementById('o-lot').value} lot`;
     }
   }catch{}
 }
 
 document.getElementById('tf-sel').addEventListener('change',()=>{if(activeSym)fetchBars(activeSym);});
-
-function updateOptNote(n){
-  const tf=document.getElementById('tf-sel').value,lot=document.getElementById('o-lot').value;
-  document.getElementById('opt-note').textContent=`${tf} · ${n} bar · ${lot} lot üzerinden hesaplanır`;
-}
 
 // ── SYMBOL TABS ──
 function renderSymTabs(syms){
@@ -328,7 +320,7 @@ function renderSymTabs(syms){
       activeSym=s;document.querySelectorAll('.sym-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
       if(allTicks[s])renderTick(allTicks[s]);
       const tf=document.getElementById('tf-sel').value;
-      if(barCache[s+'_'+tf]){drawMain(barCache[s+'_'+tf]);}else fetchBars(s);
+      if(barCache[s+'_'+tf]){drawMain(barCache[s+'_'+tf]);updateSig(barCache[s+'_'+tf]);}else fetchBars(s);
     };bar.appendChild(t);
   });
   document.querySelectorAll('.sym-tab').forEach(t=>t.classList.toggle('active',t.dataset.s===activeSym));
@@ -338,28 +330,46 @@ function renderSymTabs(syms){
 function renderTick(t){
   if(!t)return;
   set('p-sym',t.symbol);set('p-bid',f5(t.bid));set('p-ask',f5(t.ask));
-  // Spread: 5 haneli broker'da 10'a böl = pip
-  const pip = t.spread / 10;
-  set('p-spread', f1(pip)+' pip');
+  const pip=t.spread/10;
+  set('p-spread',f1(pip)+' pip');
   set('p-bal',f2(t.balance)+' '+(t.currency||''));
   set('p-eq',f2(t.equity));set('p-fm',f2(t.free_margin));
-  // Sinyal — optimizer'ın bulduğu MA'ya göre
-  const tf=document.getElementById('tf-sel').value,bars=barCache[t.symbol+'_'+tf];
-  const sig=bars?getSig(bars,bestMA.fast,bestMA.slow,bestMA.type):'NEUTRAL';
-  set('p-sig',sig);document.getElementById('p-sig-card').className='pc '+(sig==='BUY'?'buy':sig==='SELL'?'sell':'warn');
-  // Grafik üzerinde sinyal badge
+}
+
+// ── SİNYAL (kesişim bazlı) ──
+function updateSig(bars){
+  const sig=getSig(bars,bestMA.fast,bestMA.slow,bestMA.type);
+  set('p-sig',sig.label);
+  document.getElementById('p-sig-card').className='pc '+(sig.bull?'buy':sig.bear?'sell':'warn');
   const cs=document.getElementById('chart-sig');
-  cs.textContent=`${sig} · MA(${bestMA.fast}/${bestMA.slow})`;
-  cs.style.background=sig==='BUY'?'#dcfce7':sig==='SELL'?'#fee2e2':'#f1f5f9';
-  cs.style.color=sig==='BUY'?'#15803d':sig==='SELL'?'#dc2626':'#64748b';
+  cs.textContent=`${sig.label} · MA(${bestMA.fast}/${bestMA.slow})`;
+  cs.className='sig-badge '+sig.cls;
+}
+
+function getSig(bars,fP,sP,type){
+  if(!bars||bars.length<sP+3)return{label:'NEUTRAL',bull:false,bear:false,cls:''};
+  const c=bars.map(b=>b.c);
+  const mF=calcMA(c,fP,type),mS=calcMA(c,sP,type);
+  const n=mF.length;
+  if(mF[n-1]===null||mS[n-1]===null)return{label:'NEUTRAL',bull:false,bear:false,cls:''};
+
+  // Son 3 barda kesişim var mı?
+  for(let i=n-1;i>=Math.max(1,n-3);i--){
+    if(mF[i]===null||mS[i]===null||mF[i-1]===null||mS[i-1]===null)continue;
+    if(mF[i]>mS[i]&&mF[i-1]<=mS[i-1])return{label:'✦ KESİŞİM BUY',bull:true,bear:false,cls:'cross-buy'};
+    if(mF[i]<mS[i]&&mF[i-1]>=mS[i-1])return{label:'✦ KESİŞİM SELL',bull:false,bear:true,cls:'cross-sell'};
+  }
+  // Kesişim yok — trend
+  if(mF[n-1]>mS[n-1])return{label:'YUKARI TREND',bull:true,bear:false,cls:'buy'};
+  if(mF[n-1]<mS[n-1])return{label:'AŞAĞI TREND',bull:false,bear:true,cls:'sell'};
+  return{label:'NEUTRAL',bull:false,bear:false,cls:''};
 }
 
 // ── DATE FILTER ──
-document.querySelectorAll('.filter-btn').forEach(btn=>{
+document.querySelectorAll('.fbtn').forEach(btn=>{
   btn.onclick=()=>{
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter=btn.dataset.f;
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');activeFilter=btn.dataset.f;
     document.getElementById('date-range').style.display=activeFilter==='custom'?'flex':'none';
     renderStats();renderHistory(history);
   };
@@ -376,19 +386,15 @@ function filterHistory(hist){
   });
   return closed.filter(t=>{
     const d=new Date(t.time*1000);
-    if(activeFilter==='today'){
-      return d.toDateString()===now.toDateString();
-    }else if(activeFilter==='week'){
-      const wStart=new Date(now);wStart.setDate(now.getDate()-now.getDay());wStart.setHours(0,0,0,0);
-      return d>=wStart;
-    }else if(activeFilter==='month'){
-      return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
-    }else if(activeFilter==='custom'){
+    if(activeFilter==='today')return d.toDateString()===now.toDateString();
+    if(activeFilter==='week'){const w=new Date(now);w.setDate(now.getDate()-now.getDay());w.setHours(0,0,0,0);return d>=w;}
+    if(activeFilter==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(activeFilter==='custom'){
       const from=dateFrom?new Date(dateFrom):null;
       const to=dateTo?new Date(dateTo+'T23:59:59'):null;
       if(from&&d<from)return false;if(to&&d>to)return false;return true;
     }
-    return true; // all
+    return true;
   });
 }
 
@@ -397,17 +403,13 @@ function renderStats(){
   const filtered=filterHistory(history).sort((a,b)=>b.time-a.time);
   let wins=0,losses=0,pnl=0;
   filtered.forEach(t=>{pnl+=t.profit||0;(t.profit||0)>=0?wins++:losses++;});
-  const total=wins+losses,wr=total>0?(wins/total*100).toFixed(1):'0.0';
-  const avg=total>0?pnl/total:0;
+  const total=wins+losses,wr=total>0?(wins/total*100).toFixed(1):'0.0',avg=total>0?pnl/total:0;
   set('st-wr',wr+'%');set('st-tr',total);
-  const pe=document.getElementById('st-pnl');
-  pe.textContent=(pnl>=0?'+':'')+f2(pnl);pe.className='sv '+(pnl>=0?'sv-buy':'sv-sell');
-  const ae=document.getElementById('st-avg');
-  ae.textContent=(avg>=0?'+':'')+f2(avg);ae.className='sv '+(avg>=0?'sv-buy':'sv-sell');
+  const pe=document.getElementById('st-pnl');pe.textContent=(pnl>=0?'+':'')+f2(pnl);pe.className='sv '+(pnl>=0?'sv-buy':'sv-sell');
+  const ae=document.getElementById('st-avg');ae.textContent=(avg>=0?'+':'')+f2(avg);ae.className='sv '+(avg>=0?'sv-buy':'sv-sell');
   set('wl-w',wins+' Kazanan');set('wl-l',losses+' Kaybeden');
   document.getElementById('wl-fill').style.width=(total>0?wins/total*100:0)+'%';
-  // Başlık
-  const labels={today:'Bugün',week:'Bu Hafta',month:'Bu Ay',all:'Tüm Zamanlar',custom:'Seçili Dönem'};
+  const labels={today:'Bugünün İşlemleri',week:'Bu Haftanın İşlemleri',month:'Bu Ayın İşlemleri',all:'Tüm İşlemler',custom:'Seçili Dönem'};
   document.getElementById('hist-title').textContent=labels[activeFilter]||'İşlemler';
 }
 
@@ -438,12 +440,12 @@ function renderHistory(hist){
       <td>${f2(t.volume)}</td>
       <td class="${t.profit>=0?'pnl-p':'pnl-n'}">${t.profit>=0?'+':''}${f2(t.profit)}</td>
       <td><span class="badge b-${t.result.toLowerCase()}">${t.result}</span></td>
-      <td style="color:var(--light);font-size:11px">${dt}</td>
+      <td style="color:var(--light);font-size:10px">${dt}</td>
     </tr>`;
   }).join('');
 }
 
-// ── MA HESAPLAMA ──
+// ── MA ──
 function calcMA(c,p,type='EMA'){
   const r=new Array(c.length).fill(null);if(c.length<p)return r;
   if(type==='SMA'){for(let i=p-1;i<c.length;i++){let s=0;for(let j=0;j<p;j++)s+=c[i-j];r[i]=s/p;}}
@@ -452,30 +454,17 @@ function calcMA(c,p,type='EMA'){
   return r;
 }
 
-function getSig(bars,fP,sP,type='EMA'){
-  if(!bars||bars.length<sP+2)return'NEUTRAL';
-  const c=bars.map(b=>b.c);
-  const mF=calcMA(c,fP,type),mS=calcMA(c,sP,type);
-  const lF=mF[mF.length-1],pF=mF[mF.length-2];
-  const lS=mS[mS.length-1],pS=mS[mS.length-2];
-  if(lF>lS&&pF<=pS)return'BUY';   // kesişim yukarı
-  if(lF<lS&&pF>=pS)return'SELL';  // kesişim aşağı
-  if(lF>lS)return'BUY';           // hızlı üstte
-  if(lF<lS)return'SELL';          // hızlı altta
-  return'NEUTRAL';
-}
-
-// ── ANA GRAFİK ──
+// ── GRAFİK ──
 function drawMain(bars){
   const cv=document.getElementById('main-canvas'),dpr=devicePixelRatio||1;
-  const W=cv.offsetWidth,H=cv.offsetHeight||340;
+  const W=cv.offsetWidth,H=cv.offsetHeight||360;
   cv.width=W*dpr;cv.height=H*dpr;const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
 
   const fP=bestMA.fast,sP=bestMA.slow,mt=bestMA.type;
-  const n=Math.min(bars.length,150),data=bars.slice(-n),closes=data.map(b=>b.c);
+  const n=Math.min(bars.length,300),data=bars.slice(-n),closes=data.map(b=>b.c);
   const maF=calcMA(closes,fP,mt),maS=calcMA(closes,sP,mt);
   const minV=Math.min(...data.map(b=>b.l)),maxV=Math.max(...data.map(b=>b.h)),rng=maxV-minV||.0001;
-  const pad={t:20,r:12,b:32,l:72},cW=W-pad.l-pad.r,cH=H-pad.t-pad.b,bW=cW/n;
+  const pad={t:18,r:12,b:30,l:76},cW=W-pad.l-pad.r,cH=H-pad.t-pad.b,bW=cW/n;
 
   ctx.clearRect(0,0,W,H);
 
@@ -484,19 +473,21 @@ function drawMain(bars){
   for(let i=0;i<=5;i++){
     const y=pad.t+(i/5)*cH;
     ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
-    ctx.fillStyle='#94a3b8';ctx.font='10px Inter';ctx.textAlign='right';
-    ctx.fillText(f5(maxV-(i/5)*rng),pad.l-4,y+3);
+    ctx.fillStyle='#94a3b8';ctx.font='9px Inter';ctx.textAlign='right';
+    ctx.fillText(f5(maxV-(i/5)*rng),pad.l-3,y+3);
   }
 
   // Zaman etiketleri
   ctx.fillStyle='#94a3b8';ctx.font='9px Inter';ctx.textAlign='center';
-  [0,Math.floor(n/4),Math.floor(n/2),Math.floor(3*n/4),n-1].forEach(i=>{
-    if(!data[i])return;
+  const steps=Math.min(6,n);
+  for(let k=0;k<=steps;k++){
+    const i=Math.floor(k/steps*(n-1));
+    if(!data[i])continue;
     const x=pad.l+i*bW+bW/2;
     const d=new Date(data[i].t*1000);
-    const label=d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
-    ctx.fillText(label,x,pad.t+cH+14);
-  });
+    const lbl=d.getMonth()+1+'/'+d.getDate()+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+    ctx.fillText(lbl,x,pad.t+cH+18);
+  }
 
   // Mumlar
   data.forEach((b,i)=>{
@@ -506,36 +497,35 @@ function drawMain(bars){
     ctx.strokeStyle=bull?'#16a34a':'#dc2626';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();
     ctx.fillStyle=bull?'rgba(22,163,74,.75)':'rgba(220,38,38,.75)';
-    ctx.fillRect(x-bW*.35,Math.min(yO,yC),bW*.7,Math.abs(yC-yO)||1);
+    ctx.fillRect(x-bW*.38,Math.min(yO,yC),bW*.76,Math.abs(yC-yO)||1);
   });
 
   // MA çizgileri
-  function line(ma,color,lw,dash=[]){
-    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);let s=false;
+  function line(ma,color,lw){
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;let s=false;
     ma.forEach((v,i)=>{if(v===null)return;const x=pad.l+i*bW+bW/2,y=pad.t+(1-(v-minV)/rng)*cH;s?ctx.lineTo(x,y):(ctx.moveTo(x,y),s=true)});
-    ctx.stroke();ctx.setLineDash([]);
+    ctx.stroke();
   }
-  line(maF,'#2563eb',2);
+  line(maF,'#2563eb',1.8);
   line(maS,'#f97316',1.5);
 
-  // Legend
-  ctx.font='11px Inter';ctx.textAlign='left';
-  ctx.fillStyle='#2563eb';ctx.fillText(`MA(${fP}) ${mt}`,pad.l+4,pad.t+13);
-  ctx.fillStyle='#f97316';ctx.fillText(`MA(${sP}) ${mt}`,pad.l+110,pad.t+13);
-
-  // Son kesişim noktasını işaretle
-  for(let i=maS.length-1;i>0;i--){
+  // Kesişim noktalarını işaretle
+  for(let i=1;i<n;i++){
     if(maF[i]===null||maS[i]===null||maF[i-1]===null||maS[i-1]===null)continue;
-    const cross=(maF[i]>maS[i]&&maF[i-1]<=maS[i-1])||(maF[i]<maS[i]&&maF[i-1]>=maS[i-1]);
-    if(cross){
+    const crossUp=maF[i]>maS[i]&&maF[i-1]<=maS[i-1];
+    const crossDn=maF[i]<maS[i]&&maF[i-1]>=maS[i-1];
+    if(crossUp||crossDn){
       const x=pad.l+i*bW+bW/2,y=pad.t+(1-(maF[i]-minV)/rng)*cH;
-      const bull=maF[i]>maS[i];
-      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);
-      ctx.fillStyle=bull?'#16a34a':'#dc2626';ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fillStyle=crossUp?'#16a34a':'#dc2626';ctx.fill();
       ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
-      break;
     }
   }
+
+  // Legend
+  ctx.font='10px Inter';ctx.textAlign='left';
+  ctx.fillStyle='#2563eb';ctx.fillText(`MA(${fP}) ${mt}`,pad.l+4,pad.t+12);
+  ctx.fillStyle='#f97316';ctx.fillText(`MA(${sP}) ${mt}`,pad.l+100,pad.t+12);
 }
 
 // ── OPTIMIZER ──
@@ -545,7 +535,9 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   const fMin=+document.getElementById('f-min').value,fMax=+document.getElementById('f-max').value;
   const sMin=+document.getElementById('s-min').value,sMax=+document.getElementById('s-max').value;
   const mt=document.getElementById('ma-type').value,lot=+document.getElementById('o-lot').value||0.1;
-  const sl=+document.getElementById('o-sl').value,tp=+document.getElementById('o-tp').value;
+  // pip → puan dönüşümü
+  const slPip=+document.getElementById('o-sl').value;
+  const tpPip=+document.getElementById('o-tp').value;
   const btn=document.getElementById('btn-opt');btn.disabled=true;btn.textContent='Hesaplanıyor...';
   const prog=document.getElementById('prog'),pf=document.getElementById('prog-f');prog.style.display='block';
 
@@ -553,6 +545,8 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   const price=closes[closes.length-1];
   const point=price<10?0.00001:price<200?0.001:0.01;
   const pipVal=price<10?10*lot:price<200?1*lot:0.1*lot;
+  // pip → puan (5 haneli: 1 pip = 10 puan)
+  const slPts=slPip*10, tpPts=tpPip*10;
 
   const combos=[];
   for(let f=fMin;f<=fMax;f++)for(let s=sMin;s<=sMax;s++)if(s>f)combos.push([f,s]);
@@ -560,7 +554,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
 
   async function chunk(start){
     for(let i=start;i<Math.min(start+30,combos.length);i++){
-      const[f,s]=combos[i],r=bt(closes,f,s,mt,sl,tp,point,pipVal);
+      const[f,s]=combos[i],r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
       if(r.trades>=15)results.push({f,s,...r});done++;
     }
     pf.style.width=(done/combos.length*100).toFixed(1)+'%';
@@ -571,24 +565,16 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
 
   const tb=document.getElementById('opt-body');
   if(!results.length){
-    tb.innerHTML='<tr><td colspan="6" class="empty">Sonuç yok — parametre aralığını genişlet</td></tr>';
-  } else {
-    // En iyi sonucu grafiğe uygula
+    tb.innerHTML='<tr><td colspan="6" class="empty">Min 15 işlem bulunamadı — aralığı genişlet veya SL/TP artır</td></tr>';
+  }else{
     const best=results[0];
     bestMA={fast:best.f,slow:best.s,type:mt};
-
-    // Grafik güncelle
     if(barCache[activeSym+'_'+tf])drawMain(barCache[activeSym+'_'+tf]);
-
-    // Sinyal güncelle
-    if(allTicks[activeSym])renderTick(allTicks[activeSym]);
-
-    // En iyi sonuç banner
+    if(barCache[activeSym+'_'+tf])updateSig(barCache[activeSym+'_'+tf]);
     const br=document.getElementById('best-result');
     br.style.display='block';
     br.textContent=`✓ En İyi: MA(${best.f}) + MA(${best.s}) · W%${best.wr.toFixed(1)} · PF ${best.pf===999?'∞':best.pf.toFixed(2)} · ${best.profit>=0?'+':''}${f2(best.profit)}$`;
-
-    tb.innerHTML=results.slice(0,50).map((r,i)=>`<tr class="${i===0?'best':''}">
+    tb.innerHTML=results.slice(0,60).map((r,i)=>`<tr class="${i===0?'best':''}">
       <td>${r.f}</td><td>${r.s}</td><td>${r.wr.toFixed(1)}%</td><td>${r.trades}</td>
       <td class="${r.profit>=0?'pnl-p':'pnl-n'}">${r.profit>=0?'+':''}${f2(r.profit)}</td>
       <td>${r.pf===999?'∞':r.pf.toFixed(2)}</td>
@@ -597,16 +583,14 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   btn.disabled=false;btn.textContent='⚡ Optimize Et';prog.style.display='none';
 });
 
-// Optimizer tablosunda satıra tıklayınca grafiğe uygula
+// Tabloda satıra tıklayınca grafiğe uygula
 document.getElementById('opt-body').addEventListener('click',e=>{
   const row=e.target.closest('tr');if(!row)return;
   const cells=row.querySelectorAll('td');if(cells.length<2)return;
   const f=+cells[0].textContent,s=+cells[1].textContent;
-  const mt=document.getElementById('ma-type').value;
-  bestMA={fast:f,slow:s,type:mt};
+  bestMA={fast:f,slow:s,type:document.getElementById('ma-type').value};
   const tf=document.getElementById('tf-sel').value;
-  if(barCache[activeSym+'_'+tf])drawMain(barCache[activeSym+'_'+tf]);
-  if(allTicks[activeSym])renderTick(allTicks[activeSym]);
+  if(barCache[activeSym+'_'+tf]){drawMain(barCache[activeSym+'_'+tf]);updateSig(barCache[activeSym+'_'+tf]);}
   document.querySelectorAll('#opt-body tr').forEach(r=>r.classList.remove('best'));
   row.classList.add('best');
 });
@@ -631,7 +615,6 @@ function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
   return{trades,wins,wr:trades>0?wins/trades*100:0,pf:pfv,profit:totalP};
 }
 
-// ── HELPERS ──
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function f5(v){return Number(v).toFixed(5)}
 function f2(v){return Number(v).toFixed(2)}
