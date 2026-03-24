@@ -108,7 +108,7 @@ select{border:1px solid var(--border);border-radius:5px;background:var(--s2);col
 .tbl-body{overflow-y:auto;flex:1}
 
 /* Optimizer sağ kolon */
-.opt-col{width:55%;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
+.opt-col{width:45%;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
 .opt-results-area{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px}
 .sec-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 
@@ -240,20 +240,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
   <!-- SAĞ ALAN: optimizer sol, tablolar sağ -->
   <div class="right">
 
-    <!-- Sol: Tablolar dar -->
-    <div style="width:420px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)">
-      <div class="tf-bar">
-        <span class="tf-label">Zaman Dilimi:</span>
-        <select id="tf-sel">
-          <option value="M5">M5</option>
-          <option value="M15" selected>M15</option>
-          <option value="H1">H1</option>
-          <option value="H4">H4</option>
-        </select>
-        <span style="font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="tf-sym">—</span>
-        <div class="sig-badge" id="chart-sig">—</div>
-        <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
-      </div>
+    <!-- Sol: Tablolar geniş -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)">
       <div class="tables-area">
         <div class="tbl-panel">
           <div class="tbl-hdr"><div class="tbl-title">Açık Pozisyonlar</div></div>
@@ -276,10 +264,21 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       </div>
     </div>
 
-    <!-- Sağ: Optimizer geniş -->
+    <!-- Sağ: Optimizer sabit genişlik -->
     <div class="opt-col">
-      <div class="tf-bar" style="justify-content:flex-end">
-        <button id="btn-opt-all" style="padding:4px 12px;background:var(--buy);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">⚡ Tüm Pariteler</button>
+      <!-- TF + sinyal + bar sayısı burada -->
+      <div class="tf-bar">
+        <span class="tf-label">TF:</span>
+        <select id="tf-sel">
+          <option value="M5">M5</option>
+          <option value="M15" selected>M15</option>
+          <option value="H1">H1</option>
+          <option value="H4">H4</option>
+        </select>
+        <span style="font-size:13px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="tf-sym">—</span>
+        <div class="sig-badge" id="chart-sig">—</div>
+        <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
+        <button id="btn-opt-all" style="margin-left:auto;padding:4px 12px;background:var(--buy);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">⚡ Tüm Pariteler</button>
       </div>
       <!-- Optimizer sonuçları - tek sembol -->
       <div id="opt-single" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px">
@@ -292,9 +291,9 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
             <thead><tr>
               <th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th>
               <th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th>
-              <th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th>MaxZarar(pip)</th>
+              <th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th>MaxZarar(pip)</th><th></th>
             </tr></thead>
-            <tbody id="opt-body"><tr><td colspan="10" class="empty">Optimize Et butonuna bas</td></tr></tbody>
+            <tbody id="opt-body"><tr><td colspan="11" class="empty">Optimize Et butonuna bas</td></tr></tbody>
           </table>
         </div>
       </div>
