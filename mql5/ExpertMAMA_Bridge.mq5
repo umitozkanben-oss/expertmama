@@ -205,6 +205,7 @@ void SendPositions()
            +"\"volume\":"+DoubleToString(PositionGetDouble(POSITION_VOLUME),2)+","
            +"\"sl\":"+DoubleToString(PositionGetDouble(POSITION_SL),5)+","
            +"\"tp\":"+DoubleToString(PositionGetDouble(POSITION_TP),5)+","
+           +"\"comment\":\""+PositionGetString(POSITION_COMMENT)+"\","
            +"\"time\":"+IntegerToString((long)PositionGetInteger(POSITION_TIME))+"}";
      }
    json+="],\"history\":[";
@@ -225,6 +226,7 @@ void SendPositions()
            +"\"profit\":"+DoubleToString(profit,2)+","
            +"\"volume\":"+DoubleToString(HistoryDealGetDouble(t,DEAL_VOLUME),2)+","
            +"\"result\":\""+(profit>=0?"WIN":"LOSS")+"\","
+           +"\"comment\":\""+HistoryDealGetString(t,DEAL_COMMENT)+"\","
            +"\"time\":"+IntegerToString((long)HistoryDealGetInteger(t,DEAL_TIME))+"}";
      }
    json+="]}";
@@ -241,8 +243,7 @@ void FetchStrategies()
    printf("FetchStrategies son 60: "+StringSubstr(resp,MathMax(0,StringLen(resp)-60)));
 
    // Basit JSON parser — "enabled": true/false
-   g_auto_mode = (StringFind(resp,"\"enabled\": true")>=0 || StringFind(resp,"\"enabled\":true")>=0 ||
-                  StringFind(resp,"\"enabled\": True")>=0 || StringFind(resp,"\"enabled\":True")>=0);
+   g_auto_mode = (StringFind(resp,"\"auto_mode\":true")>=0 || StringFind(resp,"\"auto_mode\": true")>=0);
    printf("auto_mode parse sonucu: "+IntegerToString(g_auto_mode));
 
    g_strat_count=0;
@@ -461,17 +462,21 @@ void RunStrategies()
       double mF_cur=mF_buf[0], mF_prev=mF_buf[1];
       double mS_cur=mS_buf[0], mS_prev=mS_buf[1];
 
+      // Aynı barda tekrar açma (stop sonrası dahil)
+      datetime cur_bar=iTime(sym,tf,0);
+      if(cur_bar==g_strat_last_bar[i]) continue;
+
       // Kesişim: önceki barda altta/üstte, şimdi üstte/altta
       bool crossUp = mF_cur>mS_cur && mF_prev<=mS_prev;
       bool crossDn = mF_cur<mS_cur && mF_prev>=mS_prev;
 
       if(!crossUp&&!crossDn) continue;
 
-      // Aynı barda tekrar işlem açma
-      datetime cur_bar=iTime(sym,tf,0);
-      if(cur_bar==g_strat_last_bar[i]) continue;
       g_strat_last_bar[i]=cur_bar;
 
+      // Açık pozisyon varsa aynı yönde tekrar açma
+      if(crossUp && has_pos && pos_type==POSITION_TYPE_BUY) continue;
+      if(crossDn && has_pos && pos_type==POSITION_TYPE_SELL) continue;
       double point   = SymbolInfoDouble(sym,SYMBOL_POINT);
       double atr_buf[1];
       double atr=0;
