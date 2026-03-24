@@ -45,9 +45,6 @@ struct Strategy {
    double sl_pip;
    double atr_mult;
    bool   active;
-   int    handle_fast;  // MA handle — önceden açılır
-   int    handle_slow;
-   int    handle_atr;
 };
 
 Strategy g_strategies[50];
@@ -89,8 +86,7 @@ void OnTick(void)
         }
 
    // Otomatik işlem motoru
-   // Strateji motoru — her zaman çalışır (oto mod VPS'ten okunur)
-   RunStrategies();
+   if(g_auto_mode) RunStrategies();
   }
 
 void OnTimer(void)
@@ -152,7 +148,7 @@ void SendTick(string sym)
    json+="\"balance\":"+DoubleToString(AccountInfoDouble(ACCOUNT_BALANCE),2)+",";
    json+="\"equity\":"+DoubleToString(AccountInfoDouble(ACCOUNT_EQUITY),2)+",";
    json+="\"margin\":"+DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN),2)+",";
-   json+="\"free_margin\":"+DoubleToString(AccountInfoDouble(ACCOUNT_MARGIN_FREE),2)+",";
+   json+="\"free_margin\":"+DoubleToString(AccountInfoDouble(ACCOUNT_FREEMARGIN),2)+",";
    json+="\"currency\":\""+AccountInfoString(ACCOUNT_CURRENCY)+"\",";
    json+="\"time\":"+IntegerToString((long)TimeCurrent());
    json+="}";
@@ -205,7 +201,6 @@ void SendPositions()
            +"\"volume\":"+DoubleToString(PositionGetDouble(POSITION_VOLUME),2)+","
            +"\"sl\":"+DoubleToString(PositionGetDouble(POSITION_SL),5)+","
            +"\"tp\":"+DoubleToString(PositionGetDouble(POSITION_TP),5)+","
-           +"\"comment\":\""+PositionGetString(POSITION_COMMENT)+"\","
            +"\"time\":"+IntegerToString((long)PositionGetInteger(POSITION_TIME))+"}";
      }
    json+="],\"history\":[";
@@ -226,7 +221,6 @@ void SendPositions()
            +"\"profit\":"+DoubleToString(profit,2)+","
            +"\"volume\":"+DoubleToString(HistoryDealGetDouble(t,DEAL_VOLUME),2)+","
            +"\"result\":\""+(profit>=0?"WIN":"LOSS")+"\","
-           +"\"comment\":\""+HistoryDealGetString(t,DEAL_COMMENT)+"\","
            +"\"time\":"+IntegerToString((long)HistoryDealGetInteger(t,DEAL_TIME))+"}";
      }
    json+="]}";
@@ -239,12 +233,10 @@ void SendPositions()
 void FetchStrategies()
   {
    string resp=GetJSON("/strategies");
-   if(resp=="") { printf("FetchStrategies: boş response"); return; }
-   printf("FetchStrategies son 60: "+StringSubstr(resp,MathMax(0,StringLen(resp)-60)));
+   if(resp=="") return;
 
    // Basit JSON parser — "enabled": true/false
-   g_auto_mode = (StringFind(resp,"\"auto_mode\":true")>=0 || StringFind(resp,"\"auto_mode\": true")>=0);
-   printf("auto_mode parse sonucu: "+IntegerToString(g_auto_mode));
+   g_auto_mode = (StringFind(resp,"\"enabled\": true")>=0 || StringFind(resp,"\"enabled\":true")>=0);
 
    g_strat_count=0;
    int pos=0;
@@ -270,13 +262,6 @@ void FetchStrategies()
 
       if(s.symbol!=""&&s.active)
         {
-         ENUM_TIMEFRAMES stf=StrToTF(s.tf);
-         ENUM_MA_METHOD method=MODE_EMA;
-         if(s.ma_type=="SMA") method=MODE_SMA;
-         else if(s.ma_type=="WMA") method=MODE_LWMA;
-         s.handle_fast = iMA(s.symbol,stf,s.fast,0,method,PRICE_CLOSE);
-         s.handle_slow = iMA(s.symbol,stf,s.slow,0,method,PRICE_CLOSE);
-         s.handle_atr  = iATR(s.symbol,stf,14);
          g_strategies[g_strat_count]=s;
          g_strat_count++;
         }
@@ -367,14 +352,13 @@ int StratMagic(int idx) { return 12100 + idx; }
 //+------------------------------------------------------------------+
 bool HasPosition(string sym, int magic, long &pos_type, ulong &pos_ticket)
   {
-   pos_type=0; pos_ticket=0;
    for(int i=0;i<PositionsTotal();i++)
      {
       ulong t=PositionGetTicket(i);
       if(t==0) continue;
-      if(PositionGetString(POSITION_SYMBOL)==sym&&(long)PositionGetInteger(POSITION_MAGIC)==magic)
+      if(PositionGetString(POSITION_SYMBOL)==sym&&PositionGetInteger(POSITION_MAGIC)==magic)
         {
-         pos_type=(long)PositionGetInteger(POSITION_TYPE);
+         pos_type=PositionGetInteger(POSITION_TYPE);
          pos_ticket=t;
          return true;
         }
@@ -385,15 +369,15 @@ bool HasPosition(string sym, int magic, long &pos_type, ulong &pos_ticket)
 //+------------------------------------------------------------------+
 //| ATR trailing SL güncelle                                        |
 //+------------------------------------------------------------------+
-void UpdateTrailingSL(string sym, ulong ticket, int atr_handle, double atr_mult)
+void UpdateTrailingSL(string sym, ulong ticket, ENUM_TIMEFRAMES tf, double atr_mult)
   {
    if(!PositionSelectByTicket(ticket)) return;
-   long  pos_type   = PositionGetInteger(POSITION_TYPE);
+   long  pos_type  = PositionGetInteger(POSITION_TYPE);
    double cur_price = PositionGetDouble(POSITION_PRICE_CURRENT);
    double cur_sl    = PositionGetDouble(POSITION_SL);
-   double atr_buf[1];
-   if(CopyBuffer(atr_handle,0,1,1,atr_buf)<=0) return;
-   double trail_dist = atr_buf[0] * atr_mult;
+   double atr       = GetATR(sym,tf,14,0);
+   if(atr<=0) return;
+   double trail_dist = atr * atr_mult;
    double new_sl;
    if(pos_type==POSITION_TYPE_BUY)
      {
@@ -414,94 +398,68 @@ void UpdateTrailingSL(string sym, ulong ticket, int atr_handle, double atr_mult)
 //+------------------------------------------------------------------+
 void RunStrategies()
   {
-   static datetime last_log=0;
-   if(TimeCurrent()-last_log>=10)
-     {
-      printf("DEBUG auto="+IntegerToString(g_auto_mode)+" strat_count="+IntegerToString(g_strat_count));
-      last_log=TimeCurrent();
-     }
-   if(!g_auto_mode || g_strat_count==0) return;
-   // Debug: ilk strateji handle kontrolü
-   if(g_strat_count>0)
-     {
-      double buf[2];
-      int n=CopyBuffer(g_strategies[0].handle_fast,0,0,2,buf);
-      static datetime last_log=0;
-      if(TimeCurrent()-last_log>=10) // 10 saniyede bir log
-        {
-         printf("DEBUG strat[0]="+g_strategies[0].id+
-                " handle="+IntegerToString(g_strategies[0].handle_fast)+
-                " CopyBuffer="+IntegerToString(n)+
-                " MA="+DoubleToString(n>0?buf[0]:0,5));
-         last_log=TimeCurrent();
-        }
-     }
    for(int i=0;i<g_strat_count;i++)
      {
-      string sym     = g_strategies[i].symbol;
-      string tf_str  = g_strategies[i].tf;
-      int    fast    = g_strategies[i].fast;
-      int    slow    = g_strategies[i].slow;
-      string ma_type = g_strategies[i].ma_type;
-      double lot     = g_strategies[i].lot;
-      double atr_mult= g_strategies[i].atr_mult;
-      string strat_id= g_strategies[i].id;
-
-      ENUM_TIMEFRAMES tf=StrToTF(tf_str);
+      Strategy &s=g_strategies[i];
+      ENUM_TIMEFRAMES tf=StrToTF(s.tf);
       int magic=StratMagic(i);
 
-      // Trailing SL her tick güncelle
-      long pos_type=0; ulong pos_ticket=0;
-      bool has_pos=HasPosition(sym,magic,pos_type,pos_ticket);
-      if(has_pos) UpdateTrailingSL(sym,pos_ticket,g_strategies[i].handle_atr,atr_mult);
+      // Sadece yeni barda işlem sinyali kontrol et
+      datetime cur_bar=iTime(s.symbol,tf,0);
+      if(cur_bar==g_strat_last_bar[i]) 
+        {
+         // Aynı bar — sadece trailing güncelle
+         long pos_type; ulong pos_ticket;
+         if(HasPosition(s.symbol,magic,pos_type,pos_ticket))
+            UpdateTrailingSL(s.symbol,pos_ticket,tf,s.atr_mult);
+         continue;
+        }
+      g_strat_last_bar[i]=cur_bar;
 
-      // MA değerleri — handle'dan direkt oku
-      double mF_buf[2], mS_buf[2];
-      if(CopyBuffer(g_strategies[i].handle_fast,0,0,2,mF_buf)<=0) continue;
-      if(CopyBuffer(g_strategies[i].handle_slow,0,0,2,mS_buf)<=0) continue;
-      double mF_cur=mF_buf[0], mF_prev=mF_buf[1];
-      double mS_cur=mS_buf[0], mS_prev=mS_buf[1];
+      // MA değerleri: shift=1 (kapanan bar), shift=2 (önceki bar)
+      double mF_cur  = GetMA(s.symbol,tf,s.fast,s.ma_type,1);
+      double mS_cur  = GetMA(s.symbol,tf,s.slow,s.ma_type,1);
+      double mF_prev = GetMA(s.symbol,tf,s.fast,s.ma_type,2);
+      double mS_prev = GetMA(s.symbol,tf,s.slow,s.ma_type,2);
 
-      // Aynı barda tekrar açma (stop sonrası dahil)
-      datetime cur_bar=iTime(sym,tf,0);
-      if(cur_bar==g_strat_last_bar[i]) continue;
+      if(mF_cur==0||mS_cur==0||mF_prev==0||mS_prev==0) continue;
 
-      // Kesişim: önceki barda altta/üstte, şimdi üstte/altta
       bool crossUp = mF_cur>mS_cur && mF_prev<=mS_prev;
       bool crossDn = mF_cur<mS_cur && mF_prev>=mS_prev;
 
-      if(!crossUp&&!crossDn) continue;
+      if(!crossUp&&!crossDn) continue; // Kesişim yok
 
-      g_strat_last_bar[i]=cur_bar;
+      // Mevcut pozisyon var mı?
+      long  pos_type=0; ulong pos_ticket=0;
+      bool  has_pos=HasPosition(s.symbol,magic,pos_type,pos_ticket);
 
-      // Açık pozisyon varsa aynı yönde tekrar açma
-      if(crossUp && has_pos && pos_type==POSITION_TYPE_BUY) continue;
-      if(crossDn && has_pos && pos_type==POSITION_TYPE_SELL) continue;
-      double point   = SymbolInfoDouble(sym,SYMBOL_POINT);
-      double atr_buf[1];
-      double atr=0;
-      if(CopyBuffer(g_strategies[i].handle_atr,0,1,1,atr_buf)>0) atr=atr_buf[0];
-      double sl_dist = (atr>0) ? atr*atr_mult : g_strategies[i].sl_pip*10*point;
+      double point = SymbolInfoDouble(s.symbol,SYMBOL_POINT);
+      double atr   = GetATR(s.symbol,tf,14,1);
+      double sl_dist = (atr>0) ? atr*s.atr_mult : s.sl_pip*10*point;
 
       if(crossUp)
         {
+         // Önce SELL varsa kapat
          if(has_pos&&pos_type==POSITION_TYPE_SELL)
             trade.PositionClose(pos_ticket);
-         double ask = SymbolInfoDouble(sym,SYMBOL_ASK);
+         // BUY aç
+         double ask = SymbolInfoDouble(s.symbol,SYMBOL_ASK);
          double sl  = ask - sl_dist;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Buy(lot,sym,ask,sl,0,"ExpertMAMA_"+strat_id))
-            printf("BUY açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
+         if(trade.Buy(s.lot,s.symbol,ask,sl,0,"ExpertMAMA_"+s.id))
+            printf("BUY açıldı: "+s.symbol+" "+s.id+" SL="+DoubleToString(sl,5));
         }
       else if(crossDn)
         {
+         // Önce BUY varsa kapat
          if(has_pos&&pos_type==POSITION_TYPE_BUY)
             trade.PositionClose(pos_ticket);
-         double bid = SymbolInfoDouble(sym,SYMBOL_BID);
+         // SELL aç
+         double bid = SymbolInfoDouble(s.symbol,SYMBOL_BID);
          double sl  = bid + sl_dist;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Sell(lot,sym,bid,sl,0,"ExpertMAMA_"+strat_id))
-            printf("SELL açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
+         if(trade.Sell(s.lot,s.symbol,bid,sl,0,"ExpertMAMA_"+s.id))
+            printf("SELL açıldı: "+s.symbol+" "+s.id+" SL="+DoubleToString(sl,5));
         }
      }
   }
