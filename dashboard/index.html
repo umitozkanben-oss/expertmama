@@ -456,10 +456,8 @@ function filterHistory(hist){
   return closed.filter(t=>{
     const d=new Date(t.time*1000);
     if(activeFilter==='today'){
-      const tr=new Date(now.getTime()+3*60*60*1000); // CET→TR (+3 saat)
-      const midnight=new Date(tr);midnight.setHours(0,0,0,0);
-      const midnightCET=new Date(midnight.getTime()-3*60*60*1000);
-      return d>=midnightCET;
+      const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0,0,0);
+      return d>=midnight;
     }
     if(activeFilter==='week'){const w=new Date(now);w.setDate(now.getDate()-now.getDay());w.setHours(0,0,0,0);return d>=w;}
     if(activeFilter==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
