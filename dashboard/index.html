@@ -90,7 +90,7 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 .main-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
 /* TF + Sinyal bar */
-.tf-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff}
+.tf-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:#fff;flex-wrap:wrap}
 .tf-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .sig-badge{font-size:13px;font-weight:600;padding:4px 12px;border-radius:10px;background:var(--s2);color:var(--muted);white-space:nowrap}
 .sig-badge.buy{background:#dcfce7;color:#15803d}
@@ -107,10 +107,10 @@ select{border:1px solid var(--border);border-radius:5px;background:var(--s2);col
 .tbl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .tbl-body{overflow-y:auto;flex:1}
 
-/* Optimizer sağ kolon — sol panele taşındı */
-.opt-col{width:340px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
+/* Optimizer sağ kolon */
+.opt-col{width:510px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
 .opt-results-area{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px}
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.sec-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 
 /* Aktif stratejiler */
 .strat-area{padding:0 12px 12px;flex-shrink:0;max-height:240px;overflow-y:auto;border-top:1px solid var(--border)}
@@ -128,10 +128,10 @@ select{border:1px solid var(--border);border-radius:5px;background:var(--s2);col
 
 /* Tablolar */
 table{width:100%;border-collapse:collapse}
-thead th{position:sticky;top:0;background:var(--s2);padding:6px 9px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
+thead th{position:sticky;top:0;background:var(--s2);padding:6px 8px;text-align:left;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
 tbody tr{border-bottom:1px solid #f1f5f9;cursor:pointer}
 tbody tr:hover{background:#f8fafc}
-tbody td{padding:7px 9px;font-family:var(--mono);font-size:13px}
+tbody td{padding:7px 8px;font-family:var(--mono);font-size:13px}
 tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
 .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:12px;font-weight:600}
 .b-buy{background:#dcfce7;color:#15803d}.b-sell{background:#fee2e2;color:#dc2626}
