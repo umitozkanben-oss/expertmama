@@ -35,7 +35,7 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 .body{display:flex;flex:1;overflow:hidden}
 
 /* SOL PANEL */
-.left{width:260px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.left{width:320px;flex-shrink:0;background:#fff;border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
 .lsec{padding:10px 13px;border-bottom:1px solid var(--border)}
 .lsec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
 
@@ -53,8 +53,8 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 
 /* Hesap */
 .acct-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
-.acct-row .lbl{font-size:12px;color:var(--muted)}
-.acct-row .val{font-family:var(--mono);font-size:13px;font-weight:500}
+.acct-row .lbl{font-size:14px;color:var(--muted)}
+.acct-row .val{font-family:var(--mono);font-size:15px;font-weight:500}
 
 /* Filtre + stats */
 .filter-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
@@ -64,8 +64,8 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 .date-range input{border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-size:11px;padding:3px 6px;outline:none;width:100%}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .sitem{background:var(--s2);border-radius:6px;padding:8px;text-align:center}
-.sitem .sv{font-family:var(--mono);font-size:22px;font-weight:500;line-height:1;margin-bottom:2px}
-.sitem .sl{font-size:11px;color:var(--muted)}
+.sitem .sv{font-family:var(--mono);font-size:26px;font-weight:500;line-height:1;margin-bottom:2px}
+.sitem .sl{font-size:13px;color:var(--muted)}
 .sv-buy{color:var(--buy)}.sv-sell{color:var(--sell)}.sv-acc{color:var(--accent)}
 .wl-wrap{margin-top:7px}
 .wl-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:3px}
@@ -74,8 +74,8 @@ header{display:flex;align-items:center;padding:9px 18px;background:#fff;border-b
 
 /* Optimizer sol form */
 .opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px}
-.of label{font-size:11px;color:var(--muted);display:block;margin-bottom:2px}
-.of input,.of select{width:100%;border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-family:var(--mono);font-size:13px;padding:4px 6px;outline:none}
+.of label{font-size:13px;color:var(--muted);display:block;margin-bottom:2px}
+.of input,.of select{width:100%;border:1px solid var(--border);border-radius:4px;background:var(--s2);color:var(--text);font-family:var(--mono);font-size:14px;padding:4px 6px;outline:none}
 .opt-note{font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.4}
 .best-banner{font-size:11px;padding:5px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;color:#15803d;font-weight:600;display:none;margin-bottom:5px;line-height:1.5}
 #btn-opt{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-weight:600;font-size:13px;cursor:pointer}
@@ -184,16 +184,6 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
   <div class="left">
 
     <div class="lsec">
-      <div class="lsec-title">Fiyat — <span id="p-sym-title">—</span></div>
-      <div class="price-grid">
-        <div class="pitem"><div class="lbl">BID</div><div class="val" id="p-bid">—</div></div>
-        <div class="pitem"><div class="lbl">ASK</div><div class="val" id="p-ask">—</div></div>
-        <div class="pitem"><div class="lbl">Spread</div><div class="val" id="p-spread">—</div></div>
-        <div class="pitem" id="p-sig-card"><div class="lbl">Sinyal</div><div class="val" id="p-sig">—</div></div>
-      </div>
-    </div>
-
-    <div class="lsec">
       <div class="lsec-title">Hesap</div>
       <div class="acct-row"><span class="lbl">Bakiye</span><span class="val" id="p-bal">—</span></div>
       <div class="acct-row"><span class="lbl">Equity</span><span class="val" id="p-eq">—</span></div>
@@ -238,8 +228,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
           <select id="ma-type"><option value="SMA">SMA</option><option value="EMA" selected>EMA</option><option value="WMA">WMA</option></select>
         </div>
         <div class="of"><label>Lot</label><input type="number" id="o-lot" value="0.05" step="0.01"></div>
-        <div class="of"><label>SL (pip)</label><input type="number" id="o-sl" value="" placeholder="0=kapalı"></div>
-        <div class="of"><label>TP (pip)</label><input type="number" id="o-tp" value="" placeholder="0=kapalı"></div>
+        <div class="of"><label>SL (pip)</label><input type="number" id="o-sl" value="10"></div>
+        <div class="of"><label>TP (pip)</label><input type="number" id="o-tp" value="30"></div>
         <div class="of"><label>ATR Çarpan</label><input type="number" id="o-atr" value="1.5" step="0.1"></div>
       </div>
       <div class="opt-note" id="opt-note">TF seç → Optimize Et<br><span style="color:var(--light)">Min: 20 işlem · W%≥45 · PF≥1.5</span></div>
@@ -301,8 +291,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
           <div class="tbl-hdr"><div class="tbl-title">Açık Pozisyonlar</div></div>
           <div class="tbl-body">
             <table>
-              <thead><tr><th>Sembol</th><th>Yön</th><th>Lot</th><th>Açılış</th><th>Güncel</th><th>SL</th><th>TP</th><th>K/Z</th></tr></thead>
-              <tbody id="pos-body"><tr><td colspan="8" class="empty">Açık pozisyon yok</td></tr></tbody>
+              <thead><tr><th>Sembol</th><th>Yön</th><th>Lot</th><th>Açılış</th><th>Güncel</th><th>SL</th><th>TP</th><th>K/Z</th><th>Strateji</th></tr></thead>
+              <tbody id="pos-body"><tr><td colspan="9" class="empty">Açık pozisyon yok</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -310,8 +300,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
           <div class="tbl-hdr"><div class="tbl-title" id="hist-title">Bugünün İşlemleri</div></div>
           <div class="tbl-body">
             <table>
-              <thead><tr><th>Ticket</th><th>Sembol</th><th>Yön</th><th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Tarih</th></tr></thead>
-              <tbody id="hist-body"><tr><td colspan="7" class="empty">İşlem yok</td></tr></tbody>
+              <thead><tr><th>Ticket</th><th>Sembol</th><th>Yön</th><th>Lot</th><th>K/Z</th><th>Sonuç</th><th>Strateji</th><th>Tarih</th></tr></thead>
+              <tbody id="hist-body"><tr><td colspan="8" class="empty">İşlem yok</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -494,6 +484,7 @@ function renderPositions(pos){
     <td>${f2(p.volume)}</td><td>${f5(p.open_price)}</td><td>${f5(p.current_price)}</td>
     <td>${p.sl?f5(p.sl):'—'}</td><td>${p.tp?f5(p.tp):'—'}</td>
     <td class="${p.profit>=0?'pnl-p':'pnl-n'}">${p.profit>=0?'+':''}${f2(p.profit)}</td>
+    <td style="font-size:11px;color:var(--muted)">${p.comment||'—'}</td>
   </tr>`).join('');
 }
 
@@ -509,6 +500,7 @@ function renderHistory(hist){
       <td>${f2(t.volume)}</td>
       <td class="${t.profit>=0?'pnl-p':'pnl-n'}">${t.profit>=0?'+':''}${f2(t.profit)}</td>
       <td><span class="badge b-${t.result.toLowerCase()}">${t.result}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${t.comment||'—'}</td>
       <td style="color:var(--light);font-size:12px">${dt}</td>
     </tr>`;
   }).join('');

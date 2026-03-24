@@ -45,6 +45,9 @@ struct Strategy {
    double sl_pip;
    double atr_mult;
    bool   active;
+   int    handle_fast;  // MA handle — önceden açılır
+   int    handle_slow;
+   int    handle_atr;
 };
 
 Strategy g_strategies[50];
@@ -86,7 +89,8 @@ void OnTick(void)
         }
 
    // Otomatik işlem motoru
-   if(g_auto_mode) RunStrategies();
+   // Strateji motoru — her zaman çalışır (oto mod VPS'ten okunur)
+   RunStrategies();
   }
 
 void OnTimer(void)
@@ -233,10 +237,13 @@ void SendPositions()
 void FetchStrategies()
   {
    string resp=GetJSON("/strategies");
-   if(resp=="") return;
+   if(resp=="") { printf("FetchStrategies: boş response"); return; }
+   printf("FetchStrategies son 60: "+StringSubstr(resp,MathMax(0,StringLen(resp)-60)));
 
    // Basit JSON parser — "enabled": true/false
-   g_auto_mode = (StringFind(resp,"\"enabled\": true")>=0 || StringFind(resp,"\"enabled\":true")>=0);
+   g_auto_mode = (StringFind(resp,"\"enabled\": true")>=0 || StringFind(resp,"\"enabled\":true")>=0 ||
+                  StringFind(resp,"\"enabled\": True")>=0 || StringFind(resp,"\"enabled\":True")>=0);
+   printf("auto_mode parse sonucu: "+IntegerToString(g_auto_mode));
 
    g_strat_count=0;
    int pos=0;
@@ -262,6 +269,13 @@ void FetchStrategies()
 
       if(s.symbol!=""&&s.active)
         {
+         ENUM_TIMEFRAMES stf=StrToTF(s.tf);
+         ENUM_MA_METHOD method=MODE_EMA;
+         if(s.ma_type=="SMA") method=MODE_SMA;
+         else if(s.ma_type=="WMA") method=MODE_LWMA;
+         s.handle_fast = iMA(s.symbol,stf,s.fast,0,method,PRICE_CLOSE);
+         s.handle_slow = iMA(s.symbol,stf,s.slow,0,method,PRICE_CLOSE);
+         s.handle_atr  = iATR(s.symbol,stf,14);
          g_strategies[g_strat_count]=s;
          g_strat_count++;
         }
@@ -370,15 +384,15 @@ bool HasPosition(string sym, int magic, long &pos_type, ulong &pos_ticket)
 //+------------------------------------------------------------------+
 //| ATR trailing SL güncelle                                        |
 //+------------------------------------------------------------------+
-void UpdateTrailingSL(string sym, ulong ticket, ENUM_TIMEFRAMES tf, double atr_mult)
+void UpdateTrailingSL(string sym, ulong ticket, int atr_handle, double atr_mult)
   {
    if(!PositionSelectByTicket(ticket)) return;
-   long  pos_type  = PositionGetInteger(POSITION_TYPE);
+   long  pos_type   = PositionGetInteger(POSITION_TYPE);
    double cur_price = PositionGetDouble(POSITION_PRICE_CURRENT);
    double cur_sl    = PositionGetDouble(POSITION_SL);
-   double atr       = GetATR(sym,tf,14,0);
-   if(atr<=0) return;
-   double trail_dist = atr * atr_mult;
+   double atr_buf[1];
+   if(CopyBuffer(atr_handle,0,1,1,atr_buf)<=0) return;
+   double trail_dist = atr_buf[0] * atr_mult;
    double new_sl;
    if(pos_type==POSITION_TYPE_BUY)
      {
@@ -399,6 +413,28 @@ void UpdateTrailingSL(string sym, ulong ticket, ENUM_TIMEFRAMES tf, double atr_m
 //+------------------------------------------------------------------+
 void RunStrategies()
   {
+   static datetime last_log=0;
+   if(TimeCurrent()-last_log>=10)
+     {
+      printf("DEBUG auto="+IntegerToString(g_auto_mode)+" strat_count="+IntegerToString(g_strat_count));
+      last_log=TimeCurrent();
+     }
+   if(!g_auto_mode || g_strat_count==0) return;
+   // Debug: ilk strateji handle kontrolü
+   if(g_strat_count>0)
+     {
+      double buf[2];
+      int n=CopyBuffer(g_strategies[0].handle_fast,0,0,2,buf);
+      static datetime last_log=0;
+      if(TimeCurrent()-last_log>=10) // 10 saniyede bir log
+        {
+         printf("DEBUG strat[0]="+g_strategies[0].id+
+                " handle="+IntegerToString(g_strategies[0].handle_fast)+
+                " CopyBuffer="+IntegerToString(n)+
+                " MA="+DoubleToString(n>0?buf[0]:0,5));
+         last_log=TimeCurrent();
+        }
+     }
    for(int i=0;i<g_strat_count;i++)
      {
       string sym     = g_strategies[i].symbol;
@@ -413,34 +449,33 @@ void RunStrategies()
       ENUM_TIMEFRAMES tf=StrToTF(tf_str);
       int magic=StratMagic(i);
 
-      // Sadece yeni barda işlem sinyali kontrol et
-      datetime cur_bar=iTime(sym,tf,0);
-      if(cur_bar==g_strat_last_bar[i])
-        {
-         long pos_type; ulong pos_ticket;
-         if(HasPosition(sym,magic,pos_type,pos_ticket))
-            UpdateTrailingSL(sym,pos_ticket,tf,atr_mult);
-         continue;
-        }
-      g_strat_last_bar[i]=cur_bar;
+      // Trailing SL her tick güncelle
+      long pos_type=0; ulong pos_ticket=0;
+      bool has_pos=HasPosition(sym,magic,pos_type,pos_ticket);
+      if(has_pos) UpdateTrailingSL(sym,pos_ticket,g_strategies[i].handle_atr,atr_mult);
 
-      double mF_cur  = GetMA(sym,tf,fast,ma_type,1);
-      double mS_cur  = GetMA(sym,tf,slow,ma_type,1);
-      double mF_prev = GetMA(sym,tf,fast,ma_type,2);
-      double mS_prev = GetMA(sym,tf,slow,ma_type,2);
+      // MA değerleri — handle'dan direkt oku
+      double mF_buf[2], mS_buf[2];
+      if(CopyBuffer(g_strategies[i].handle_fast,0,0,2,mF_buf)<=0) continue;
+      if(CopyBuffer(g_strategies[i].handle_slow,0,0,2,mS_buf)<=0) continue;
+      double mF_cur=mF_buf[0], mF_prev=mF_buf[1];
+      double mS_cur=mS_buf[0], mS_prev=mS_buf[1];
 
-      if(mF_cur==0||mS_cur==0||mF_prev==0||mS_prev==0) continue;
-
+      // Kesişim: önceki barda altta/üstte, şimdi üstte/altta
       bool crossUp = mF_cur>mS_cur && mF_prev<=mS_prev;
       bool crossDn = mF_cur<mS_cur && mF_prev>=mS_prev;
 
       if(!crossUp&&!crossDn) continue;
 
-      long  pos_type=0; ulong pos_ticket=0;
-      bool  has_pos=HasPosition(sym,magic,pos_type,pos_ticket);
+      // Aynı barda tekrar işlem açma
+      datetime cur_bar=iTime(sym,tf,0);
+      if(cur_bar==g_strat_last_bar[i]) continue;
+      g_strat_last_bar[i]=cur_bar;
 
       double point   = SymbolInfoDouble(sym,SYMBOL_POINT);
-      double atr     = GetATR(sym,tf,14,1);
+      double atr_buf[1];
+      double atr=0;
+      if(CopyBuffer(g_strategies[i].handle_atr,0,1,1,atr_buf)>0) atr=atr_buf[0];
       double sl_dist = (atr>0) ? atr*atr_mult : g_strategies[i].sl_pip*10*point;
 
       if(crossUp)
