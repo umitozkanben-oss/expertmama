@@ -281,7 +281,6 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
       <div id="opt-all" style="flex:1;display:none;flex-direction:column;overflow:hidden;padding:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div class="sec-title" style="margin:0">Tüm Pariteler — En İyi 5</div>
-          <button onclick="document.getElementById('opt-all').style.display='none';document.getElementById('opt-single').style.display='flex';" style="padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;font-size:11px;cursor:pointer">← Geri</button>
         </div>
         <div style="overflow:auto;flex:1" id="opt-all-body">
           <div class="empty">Tüm Pariteler butonuna bas</div>
@@ -568,7 +567,19 @@ document.getElementById('opt-body').addEventListener('click',async e=>{
 });
 
 // ── TÜM PARİTELER OPTİMİZER ──
+let allOptOpen=false;
 document.getElementById('btn-opt-all').addEventListener('click', async()=>{
+  allOptOpen=!allOptOpen;
+  const btn=document.getElementById('btn-opt-all');
+  const single=document.getElementById('opt-single');
+  const all=document.getElementById('opt-all');
+  if(!allOptOpen){
+    single.style.display='flex';all.style.display='none';
+    btn.style.background='var(--buy)';btn.textContent='⚡ Tüm Pariteler';
+    return;
+  }
+  single.style.display='none';all.style.display='flex';
+  btn.style.background='var(--accent)';btn.textContent='✕ Kapat';
   const tf=document.getElementById('tf-sel').value;
   const fMin=+document.getElementById('f-min').value, fMax=+document.getElementById('f-max').value;
   const sMin=+document.getElementById('s-min').value, sMax=+document.getElementById('s-max').value;
