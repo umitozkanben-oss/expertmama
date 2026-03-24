@@ -257,9 +257,10 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
         <span style="font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="tf-sym">—</span>
         <div class="sig-badge" id="chart-sig">—</div>
         <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
+        <button id="btn-opt-all" style="margin-left:auto;padding:4px 12px;background:var(--buy);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">⚡ Tüm Pariteler</button>
       </div>
-      <!-- Optimizer sonuçları -->
-      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px">
+      <!-- Optimizer sonuçları - tek sembol -->
+      <div id="opt-single" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
           <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400;color:var(--muted)"></span></div>
           <span style="font-size:11px;color:var(--muted)">tıkla → aktif et</span>
@@ -274,6 +275,16 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
             </tr></thead>
             <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
           </table>
+        </div>
+      </div>
+      <!-- Tüm pariteler optimizer raporu -->
+      <div id="opt-all" style="flex:1;display:none;flex-direction:column;overflow:hidden;padding:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="sec-title" style="margin:0">Tüm Pariteler — En İyi 5</div>
+          <button onclick="document.getElementById('opt-all').style.display='none';document.getElementById('opt-single').style.display='flex';" style="padding:3px 10px;border:1px solid var(--border);border-radius:4px;background:#fff;font-size:11px;cursor:pointer">← Geri</button>
+        </div>
+        <div style="overflow:auto;flex:1" id="opt-all-body">
+          <div class="empty">Tüm Pariteler butonuna bas</div>
         </div>
       </div>
       <!-- Aktif stratejiler -->
@@ -555,6 +566,78 @@ document.getElementById('opt-body').addEventListener('click',async e=>{
   });
   fetchAll();
 });
+
+// ── TÜM PARİTELER OPTİMİZER ──
+document.getElementById('btn-opt-all').addEventListener('click', async()=>{
+  const tf=document.getElementById('tf-sel').value;
+  const fMin=+document.getElementById('f-min').value, fMax=+document.getElementById('f-max').value;
+  const sMin=+document.getElementById('s-min').value, sMax=+document.getElementById('s-max').value;
+  const mt=document.getElementById('ma-type').value, lot=+document.getElementById('o-lot').value||0.05;
+  const slPip=+(document.getElementById('o-sl').value||0), tpPip=+(document.getElementById('o-tp').value||0);
+  const slPts=slPip>0?slPip*10:999999, tpPts=tpPip>0?tpPip*10:999999;
+
+  document.getElementById('opt-single').style.display='none';
+  document.getElementById('opt-all').style.display='flex';
+  const body=document.getElementById('opt-all-body');
+  body.innerHTML='<div class="empty">Hesaplanıyor...</div>';
+
+  const syms=Object.keys(barCache).filter(k=>k.endsWith('_'+tf)).map(k=>k.replace('_'+tf,''));
+  if(!syms.length){body.innerHTML='<div class="empty">Bar verisi yok</div>';return;}
+
+  const combos=[];
+  for(let f=fMin;f<=fMax;f++) for(let s=sMin;s<=sMax;s++) if(s>f) combos.push([f,s]);
+
+  let html='';
+  for(const sym of syms){
+    const bars=barCache[sym+'_'+tf];
+    if(!bars?.length) continue;
+    const closes=bars.map(b=>b.c);
+    const price=closes[closes.length-1];
+    const tv=allTicks[sym]?.tick_value||0;
+    const point=price<10?0.00001:price<200?0.001:0.01;
+    const pipVal=tv>0?(tv*lot):(price<10?10*lot:price<200?lot:0.1*lot);
+    const results=[];
+    for(const[f,s] of combos){
+      const r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
+      if(r.trades>=20&&r.wr>=45&&(r.pf===999||r.pf>=1.5)) results.push({f,s,...r});
+    }
+    results.sort((a,b)=>(b.pf===999?5:b.pf)*(b.wr/100)-(a.pf===999?5:a.pf)*(a.wr/100));
+    const top5=results.slice(0,5);
+    html+=`<div style="margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px;font-family:var(--mono)">${sym} · ${tf} <span style="color:var(--muted);font-weight:400;font-size:11px">(${results.length} sonuç)</span></div>`;
+    if(!top5.length){html+=`<div style="font-size:11px;color:var(--light);padding:4px 0">Kriter karşılanamadı</div>`;}
+    else{
+      html+=`<table style="width:100%"><thead><tr><th>H</th><th>Y</th><th>W%</th><th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th><th>K/Z</th><th>PF</th><th>DD</th><th></th></tr></thead><tbody>`;
+      top5.forEach((r,i)=>{
+        const id=`${sym}_${tf}_${r.f}_${r.s}_${mt}`;
+        html+=`<tr class="${i===0?'best':''}">
+          <td>${r.f}</td><td>${r.s}</td><td>${r.wr.toFixed(1)}%</td>
+          <td style="color:var(--buy)">${r.wins}</td><td style="color:var(--sell)">${r.losses}</td>
+          <td class="${r.profit>=0?'pnl-p':'pnl-n'}">${r.profit>=0?'+':''}${f2(r.profit)}</td>
+          <td>${r.pf===999?'∞':r.pf.toFixed(2)}</td>
+          <td style="color:var(--sell)">-${f2(r.maxDD)}</td>
+          <td><button onclick="activateStrat('${id}','${sym}','${tf}',${r.f},${r.s},'${mt}')" style="padding:2px 8px;background:var(--accent);color:#fff;border:none;border-radius:3px;font-size:10px;cursor:pointer">Aktif</button></td>
+        </tr>`;
+      });
+      html+=`</tbody></table>`;
+    }
+    html+=`</div><hr style="border:none;border-top:1px solid var(--border);margin:6px 0">`;
+    body.innerHTML=html+'<div class="empty" style="font-size:11px">Devam ediyor...</div>';
+    await new Promise(r=>setTimeout(r,0));
+  }
+  body.innerHTML=html;
+});
+
+async function activateStrat(id,sym,tf,fast,slow,mt){
+  if(!confirm(`${sym} ${tf} ${mt}(${fast}/${slow}) aktif et?`)) return;
+  await fetch(API+'/strategies',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({id,symbol:sym,tf,fast,slow,ma_type:mt,
+      lot:+document.getElementById('o-lot').value,
+      sl_pip:+(document.getElementById('o-sl').value||0),
+      atr_mult:+document.getElementById('o-atr').value,active:true})
+  });
+  fetchAll();
+}
 
 function calcMA(c,p,type='EMA'){
   const r=new Array(c.length).fill(null);if(c.length<p)return r;
