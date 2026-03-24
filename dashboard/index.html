@@ -570,6 +570,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   const slPip=+(document.getElementById('o-sl').value||0);
   const tpPip=+(document.getElementById('o-tp').value||0);
   const btn=document.getElementById('btn-opt');btn.disabled=true;btn.textContent='Hesaplanıyor...';
+  if(pollTimer)clearInterval(pollTimer); // Optimizer sırasında poll durdur
   const prog=document.getElementById('prog'),pf=document.getElementById('prog-f');prog.style.display='block';
 
   const closes=bars.map(b=>b.c);
@@ -586,12 +587,12 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   const results=[];let done=0;
 
   async function chunk(start){
-    for(let i=start;i<Math.min(start+10,combos.length);i++){
+    for(let i=start;i<Math.min(start+30,combos.length);i++){
       const[f,s]=combos[i],r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
       if(r.trades>=20&&r.wr>=45&&(r.pf===999||r.pf>=1.5))results.push({f,s,...r});done++;
     }
     pf.style.width=(done/combos.length*100).toFixed(1)+'%';
-    if(done<combos.length){await new Promise(r=>setTimeout(r,0));await chunk(start+10);}
+    if(done<combos.length){await new Promise(r=>setTimeout(r,0));await chunk(start+30);}
   }
   await chunk(0);
   results.sort((a,b)=>{const sA=(a.pf===999?5:a.pf)*(a.wr/100);const sB=(b.pf===999?5:b.pf)*(b.wr/100);return sB-sA;});
@@ -618,6 +619,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
     </tr>`).join('');
   }
   btn.disabled=false;btn.textContent='⚡ Optimize Et';prog.style.display='none';
+  startPoll(); // Poll yeniden başlat
 });
 
 function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
