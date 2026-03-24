@@ -240,9 +240,8 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
   <!-- SAĞ ALAN: optimizer sol, tablolar sağ -->
   <div class="right">
 
-    <!-- Sol: Optimizer sonuçları + aktif stratejiler -->
+    <!-- Sol: Tablolar dar -->
     <div style="width:420px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)">
-      <!-- TF + sinyal -->
       <div class="tf-bar">
         <span class="tf-label">Zaman Dilimi:</span>
         <select id="tf-sel">
@@ -254,46 +253,7 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
         <span style="font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="tf-sym">—</span>
         <div class="sig-badge" id="chart-sig">—</div>
         <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
-        <button id="btn-opt-all" style="margin-left:auto;padding:4px 12px;background:var(--buy);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">⚡ Tüm Pariteler</button>
       </div>
-      <!-- Optimizer sonuçları - tek sembol -->
-      <div id="opt-single" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-          <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400;color:var(--muted)"></span></div>
-          <span style="font-size:11px;color:var(--muted)">tıkla → aktif et</span>
-        </div>
-        <div style="overflow:auto;flex:1">
-          <table>
-            <thead><tr>
-              <th>Hızlı</th><th>Yavaş</th><th>W%</th>
-              <th style="color:var(--buy)">W</th>
-              <th style="color:var(--sell)">L</th>
-              <th>K/Z ($)</th><th>PF</th><th>MaxDD</th>
-            </tr></thead>
-            <tbody id="opt-body"><tr><td colspan="8" class="empty">Optimize Et butonuna bas</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-      <!-- Tüm pariteler optimizer raporu -->
-      <div id="opt-all" style="flex:1;display:none;flex-direction:column;overflow:hidden;padding:10px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="sec-title" style="margin:0">Tüm Pariteler — En İyi 5</div>
-        </div>
-        <div style="overflow:auto;flex:1" id="opt-all-body">
-          <div class="empty">Tüm Pariteler butonuna bas</div>
-        </div>
-      </div>
-      <!-- Aktif stratejiler -->
-      <div style="padding:8px 10px;border-top:1px solid var(--border);flex-shrink:0;max-height:200px;overflow-y:auto">
-        <div class="lsec-title">Aktif Stratejiler <span id="strat-count" style="font-weight:400"></span></div>
-        <div class="strat-list" id="strat-list">
-          <div class="empty" style="font-size:12px">Henüz strateji eklenmedi.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sağ: Tablolar -->
-    <div class="main-col">
       <div class="tables-area">
         <div class="tbl-panel">
           <div class="tbl-hdr"><div class="tbl-title">Açık Pozisyonlar</div></div>
@@ -312,6 +272,44 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
               <tbody id="hist-body"><tr><td colspan="8" class="empty">İşlem yok</td></tr></tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sağ: Optimizer geniş -->
+    <div class="opt-col">
+      <div class="tf-bar" style="justify-content:flex-end">
+        <button id="btn-opt-all" style="padding:4px 12px;background:var(--buy);color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">⚡ Tüm Pariteler</button>
+      </div>
+      <!-- Optimizer sonuçları - tek sembol -->
+      <div id="opt-single" style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div class="sec-title" style="margin:0">Optimizer Sonuçları <span id="opt-count" style="font-weight:400;color:var(--muted)"></span></div>
+          <span style="font-size:11px;color:var(--muted)">tıkla → aktif et</span>
+        </div>
+        <div style="overflow:auto;flex:1">
+          <table id="opt-single-table">
+            <thead><tr>
+              <th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th>
+              <th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th>
+              <th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th>MaxZarar(pip)</th>
+            </tr></thead>
+            <tbody id="opt-body"><tr><td colspan="10" class="empty">Optimize Et butonuna bas</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Tüm pariteler -->
+      <div id="opt-all" style="flex:1;display:none;flex-direction:column;overflow:hidden;padding:12px">
+        <div class="sec-title">Tüm Pariteler — En İyi 5</div>
+        <div style="overflow:auto;flex:1" id="opt-all-body">
+          <div class="empty">Tüm Pariteler butonuna bas</div>
+        </div>
+      </div>
+      <!-- Aktif stratejiler -->
+      <div style="padding:8px 12px;border-top:1px solid var(--border);flex-shrink:0;max-height:200px;overflow-y:auto">
+        <div class="lsec-title">Aktif Stratejiler <span id="strat-count" style="font-weight:400"></span></div>
+        <div class="strat-list" id="strat-list">
+          <div class="empty" style="font-size:12px">Henüz strateji eklenmedi.</div>
         </div>
       </div>
     </div>
