@@ -501,7 +501,7 @@ void RunStrategies()
          double ask = SymbolInfoDouble(sym,SYMBOL_ASK);
          double sl  = ask - sl_dist;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Buy(lot,sym,ask,sl,0,"ExpertMAMA_"+strat_id))
+         if(trade.Buy(lot,sym,ask,sl,0,strat_id))
             printf("BUY açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
         }
       else if(crossDn)
@@ -511,7 +511,7 @@ void RunStrategies()
          double bid = SymbolInfoDouble(sym,SYMBOL_BID);
          double sl  = bid + sl_dist;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Sell(lot,sym,bid,sl,0,"ExpertMAMA_"+strat_id))
+         if(trade.Sell(lot,sym,bid,sl,0,strat_id))
             printf("SELL açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
         }
      }

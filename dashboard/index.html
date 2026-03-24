@@ -580,15 +580,15 @@ document.getElementById('btn-opt-all').addEventListener('click', async()=>{
   }
   single.style.display='none';all.style.display='flex';
   btn.style.background='var(--accent)';btn.textContent='✕ Kapat';
+
   const tf=document.getElementById('tf-sel').value;
   const fMin=+document.getElementById('f-min').value, fMax=+document.getElementById('f-max').value;
   const sMin=+document.getElementById('s-min').value, sMax=+document.getElementById('s-max').value;
-  const mt=document.getElementById('ma-type').value, lot=+document.getElementById('o-lot').value||0.05;
+  const lot=+document.getElementById('o-lot').value||0.05;
   const slPip=+(document.getElementById('o-sl').value||0), tpPip=+(document.getElementById('o-tp').value||0);
   const slPts=slPip>0?slPip*10:999999, tpPts=tpPip>0?tpPip*10:999999;
+  const maTypes=['SMA','EMA','WMA'];
 
-  document.getElementById('opt-single').style.display='none';
-  document.getElementById('opt-all').style.display='flex';
   const body=document.getElementById('opt-all-body');
   body.innerHTML='<div class="empty">Hesaplanıyor...</div>';
 
@@ -608,32 +608,39 @@ document.getElementById('btn-opt-all').addEventListener('click', async()=>{
     const point=price<10?0.00001:price<200?0.001:0.01;
     const pipVal=tv>0?(tv*lot):(price<10?10*lot:price<200?lot:0.1*lot);
     const results=[];
-    for(const[f,s] of combos){
-      const r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
-      if(r.trades>=20&&r.wr>=45&&(r.pf===999||r.pf>=1.5)) results.push({f,s,...r});
+    for(const mt of maTypes){
+      for(const[f,s] of combos){
+        const r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
+        if(r.trades>=20&&r.wr>=45&&(r.pf===999||r.pf>=1.5)) results.push({f,s,mt,...r});
+      }
     }
     results.sort((a,b)=>(b.pf===999?5:b.pf)*(b.wr/100)-(a.pf===999?5:a.pf)*(a.wr/100));
     const top5=results.slice(0,5);
-    html+=`<div style="margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px;font-family:var(--mono)">${sym} · ${tf} <span style="color:var(--muted);font-weight:400;font-size:11px">(${results.length} sonuç)</span></div>`;
-    if(!top5.length){html+=`<div style="font-size:11px;color:var(--light);padding:4px 0">Kriter karşılanamadı</div>`;}
+    html+=`<div style="margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:6px;font-family:var(--mono);padding:4px 0;border-bottom:2px solid var(--accent)">${sym} · ${tf} <span style="color:var(--muted);font-weight:400;font-size:12px">${results.length} sonuç</span></div>`;
+    if(!top5.length){html+=`<div style="font-size:12px;color:var(--light);padding:6px 0">Kriter karşılanamadı</div>`;}
     else{
-      html+=`<table style="width:100%"><thead><tr><th>H</th><th>Y</th><th>W%</th><th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th><th>K/Z</th><th>PF</th><th>DD</th><th></th></tr></thead><tbody>`;
+      html+=`<table style="width:100%"><thead><tr>
+        <th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th>
+        <th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th>
+        <th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th></th>
+      </tr></thead><tbody>`;
       top5.forEach((r,i)=>{
-        const id=`${sym}_${tf}_${r.f}_${r.s}_${mt}`;
+        const id=`${sym}_${tf}_${r.f}_${r.s}_${r.mt}`;
         html+=`<tr class="${i===0?'best':''}">
+          <td style="font-weight:600;color:var(--accent)">${r.mt}</td>
           <td>${r.f}</td><td>${r.s}</td><td>${r.wr.toFixed(1)}%</td>
           <td style="color:var(--buy)">${r.wins}</td><td style="color:var(--sell)">${r.losses}</td>
           <td class="${r.profit>=0?'pnl-p':'pnl-n'}">${r.profit>=0?'+':''}${f2(r.profit)}</td>
           <td>${r.pf===999?'∞':r.pf.toFixed(2)}</td>
           <td style="color:var(--sell)">-${f2(r.maxDD)}</td>
-          <td><button onclick="activateStrat('${id}','${sym}','${tf}',${r.f},${r.s},'${mt}')" style="padding:2px 8px;background:var(--accent);color:#fff;border:none;border-radius:3px;font-size:10px;cursor:pointer">Aktif</button></td>
+          <td><button onclick="activateStrat('${id}','${sym}','${tf}',${r.f},${r.s},'${r.mt}')" style="padding:3px 10px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;white-space:nowrap">Aktif Et</button></td>
         </tr>`;
       });
       html+=`</tbody></table>`;
     }
-    html+=`</div><hr style="border:none;border-top:1px solid var(--border);margin:6px 0">`;
-    body.innerHTML=html+'<div class="empty" style="font-size:11px">Devam ediyor...</div>';
+    html+=`</div>`;
+    body.innerHTML=html+'<div class="empty" style="font-size:12px">Devam ediyor...</div>';
     await new Promise(r=>setTimeout(r,0));
   }
   body.innerHTML=html;
@@ -650,6 +657,13 @@ async function activateStrat(id,sym,tf,fast,slow,mt){
   fetchAll();
 }
 
+function applyMA(f,s,mt){
+  bestMA={fast:f,slow:s,type:mt};
+  const tf=document.getElementById('tf-sel').value;
+  if(barCache[activeSym+'_'+tf])updateSig(barCache[activeSym+'_'+tf]);
+  document.querySelectorAll('#opt-body tr').forEach(r=>r.classList.remove('best'));
+}
+
 function calcMA(c,p,type='EMA'){
   const r=new Array(c.length).fill(null);if(c.length<p)return r;
   if(type==='SMA'){for(let i=p-1;i<c.length;i++){let s=0;for(let j=0;j<p;j++)s+=c[i-j];r[i]=s/p;}}
@@ -663,11 +677,11 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   if(!bars?.length){alert('Bar verisi yok.');return;}
   const fMin=+document.getElementById('f-min').value,fMax=+document.getElementById('f-max').value;
   const sMin=+document.getElementById('s-min').value,sMax=+document.getElementById('s-max').value;
-  const mt=document.getElementById('ma-type').value,lot=+document.getElementById('o-lot').value||0.05;
+  const lot=+document.getElementById('o-lot').value||0.05;
   const slPip=+(document.getElementById('o-sl').value||0);
   const tpPip=+(document.getElementById('o-tp').value||0);
   const btn=document.getElementById('btn-opt');btn.disabled=true;btn.textContent='Hesaplanıyor...';
-  if(pollTimer)clearInterval(pollTimer); // Optimizer sırasında poll durdur
+  if(pollTimer)clearInterval(pollTimer);
   const prog=document.getElementById('prog'),pf=document.getElementById('prog-f');prog.style.display='block';
 
   const closes=bars.map(b=>b.c);
@@ -675,18 +689,23 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   const tv=allTicks[activeSym]?.tick_value||0;
   const point=price<10?0.00001:price<200?0.001:0.01;
   const pipVal=tv>0?(tv*lot):(price<10?10*lot:price<200?lot:0.1*lot);
-  // SL/TP 0 ise çok büyük bir değer koy — sadece ters kesişimde çıksın
   const slPts=slPip>0?slPip*10:999999;
   const tpPts=tpPip>0?tpPip*10:999999;
+  const maTypes=['SMA','EMA','WMA'];
 
   const combos=[];
   for(let f=fMin;f<=fMax;f++)for(let s=sMin;s<=sMax;s++)if(s>f)combos.push([f,s]);
   const results=[];let done=0;
+  const total=combos.length*maTypes.length;
 
   async function chunk(start){
     for(let i=start;i<Math.min(start+30,combos.length);i++){
-      const[f,s]=combos[i],r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
-      if(r.trades>=20&&r.wr>=45&&(r.pf===999||r.pf>=1.5))results.push({f,s,...r});done++;
+      const[f,s]=combos[i];
+      for(const mt of maTypes){
+        const r=bt(closes,f,s,mt,slPts,tpPts,point,pipVal);
+        if(r.trades>=20&&r.wr>=45&&(r.pf===999||r.pf>=1.5))results.push({f,s,mt,...r});
+      }
+      done++;
     }
     pf.style.width=(done/combos.length*100).toFixed(1)+'%';
     if(done<combos.length){await new Promise(r=>setTimeout(r,0));await chunk(start+30);}
@@ -695,18 +714,23 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   results.sort((a,b)=>{const sA=(a.pf===999?5:a.pf)*(a.wr/100);const sB=(b.pf===999?5:b.pf)*(b.wr/100);return sB-sA;});
 
   set('opt-count','('+results.length+')');
+
+  // thead güncelle - MA türü sütunu ekle
+  document.querySelector('#opt-single thead tr').innerHTML=`<th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th><th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th><th>K/Z ($)</th><th>PF</th><th>MaxDD</th>`;
+
   const tb=document.getElementById('opt-body');
   if(!results.length){
-    tb.innerHTML='<tr><td colspan="8" class="empty">Kriter karşılanamadı<br><span style="color:var(--light);font-size:12px">Min 20 işlem · W%≥45 · PF≥1.5<br>SL/TP artır veya aralığı genişlet</span></td></tr>';
+    tb.innerHTML='<tr><td colspan="9" class="empty">Kriter karşılanamadı<br><span style="color:var(--light);font-size:12px">Min 20 işlem · W%≥45 · PF≥1.5</span></td></tr>';
   }else{
     const best=results[0];
-    bestMA={fast:best.f,slow:best.s,type:mt};
+    bestMA={fast:best.f,slow:best.s,type:best.mt};
     const tf2=document.getElementById('tf-sel').value;
     if(barCache[activeSym+'_'+tf2])updateSig(barCache[activeSym+'_'+tf2]);
     const br=document.getElementById('best-banner');
     br.style.display='block';
-    br.textContent=`✓ MA(${best.f})+MA(${best.s}) · ${best.wins}W/${best.losses}L · PF ${best.pf===999?'∞':best.pf.toFixed(2)} · ${best.profit>=0?'+':''}${f2(best.profit)}$`;
-    tb.innerHTML=results.slice(0,80).map((r,i)=>`<tr class="${i===0?'best':''}">
+    br.textContent=`✓ ${best.mt}(${best.f}/${best.s}) · ${best.wins}W/${best.losses}L · PF ${best.pf===999?'∞':best.pf.toFixed(2)} · ${best.profit>=0?'+':''}${f2(best.profit)}$`;
+    tb.innerHTML=results.slice(0,80).map((r,i)=>`<tr class="${i===0?'best':''}" onclick="applyMA(${r.f},${r.s},'${r.mt}')">
+      <td style="font-weight:600;color:var(--accent)">${r.mt}</td>
       <td>${r.f}</td><td>${r.s}</td><td>${r.wr.toFixed(1)}%</td>
       <td style="color:var(--buy)">${r.wins}</td>
       <td style="color:var(--sell)">${r.losses}</td>
@@ -716,7 +740,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
     </tr>`).join('');
   }
   btn.disabled=false;btn.textContent='⚡ Optimize Et';prog.style.display='none';
-  startPoll(); // Poll yeniden başlat
+  startPoll();
 });
 
 function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
