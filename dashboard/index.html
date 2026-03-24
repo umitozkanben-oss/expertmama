@@ -376,7 +376,7 @@ async function fetchBars(sym){
   if(!API)return;
   const tf=document.getElementById('tf-sel').value;
   try{
-    const r=await fetch(`${API}/bars/${sym}?limit=1000&tf=${tf}`);
+    const r=await fetch(`${API}/bars/${sym}?limit=3000&tf=${tf}`);
     if(!r.ok)return;
     const d=await r.json();
     if(d.bars?.length){
