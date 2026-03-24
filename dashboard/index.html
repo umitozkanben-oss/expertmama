@@ -416,11 +416,10 @@ function renderTick(t){
 
 function updateSig(bars){
   const sig=getSig(bars,bestMA.fast,bestMA.slow,bestMA.type);
-  set('p-sig',sig.label);
-  document.getElementById('p-sig-card').className='pitem '+(sig.crossBuy?'cross-buy':sig.crossSell?'cross-sell':sig.bull?'buy':sig.bear?'sell':'');
-  const cs=document.getElementById('chart-sig');
-  cs.textContent=`${sig.label} · MA(${bestMA.fast}/${bestMA.slow})`;
-  cs.className='sig-badge '+(sig.crossBuy?'cross-buy':sig.crossSell?'cross-sell':sig.bull?'buy':sig.bear?'sell':'');
+  const ps=document.getElementById('p-sig'); if(ps) ps.textContent=sig.label;
+  const pc=document.getElementById('p-sig-card'); if(pc) pc.className='pitem '+(sig.crossBuy?'cross-buy':sig.crossSell?'cross-sell':sig.bull?'buy':sig.bear?'sell':'');
+  const cs=document.getElementById('chart-sig'); 
+  if(cs){cs.textContent=`${sig.label} · MA(${bestMA.fast}/${bestMA.slow})`;cs.className='sig-badge '+(sig.crossBuy?'cross-buy':sig.crossSell?'cross-sell':sig.bull?'buy':sig.bear?'sell':'');}
 }
 
 function getSig(bars,fP,sP,type){
