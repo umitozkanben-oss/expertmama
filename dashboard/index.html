@@ -254,7 +254,6 @@ tr.best{background:#f0fdf4}tr.best td{color:var(--buy);font-weight:600}
           <option value="H1">H1</option>
           <option value="H4">H4</option>
         </select>
-        <span style="font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="tf-sym">—</span>
         <div class="sig-badge" id="chart-sig">—</div>
         <span style="font-size:11px;color:var(--muted)" id="bar-count"></span>
       </div>
@@ -358,11 +357,7 @@ async function fetchAll(){
     updateAutoBtn();
     renderSymTabs(d.symbols||[]);
     if(!activeSym&&(d.symbols||[]).length)activeSym=d.symbols[0];
-    if(activeSym){
-      renderTick(allTicks[activeSym]);
-      fetchBars(activeSym);
-      document.getElementById('tf-sym').textContent=activeSym;
-    }
+    if(activeSym){renderTick(allTicks[activeSym]);fetchBars(activeSym);}
     renderStats();renderPositions(positions);renderHistory(history);renderStrategies();
   }catch{setConn(false);}
 }
@@ -395,7 +390,6 @@ function renderSymTabs(syms){
     t.onclick=()=>{
       activeSym=s;document.querySelectorAll('.sym-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
       if(allTicks[s])renderTick(allTicks[s]);
-      document.getElementById('tf-sym').textContent=s;
       const tf=document.getElementById('tf-sel').value;
       if(barCache[s+'_'+tf])updateSig(barCache[s+'_'+tf]);else fetchBars(s);
       document.getElementById('p-sym-title').textContent=s;
@@ -570,7 +564,6 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   const slPip=+(document.getElementById('o-sl').value||0);
   const tpPip=+(document.getElementById('o-tp').value||0);
   const btn=document.getElementById('btn-opt');btn.disabled=true;btn.textContent='Hesaplanıyor...';
-  if(pollTimer)clearInterval(pollTimer); // Optimizer sırasında poll durdur
   const prog=document.getElementById('prog'),pf=document.getElementById('prog-f');prog.style.display='block';
 
   const closes=bars.map(b=>b.c);
@@ -619,7 +612,6 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
     </tr>`).join('');
   }
   btn.disabled=false;btn.textContent='⚡ Optimize Et';prog.style.display='none';
-  startPoll(); // Poll yeniden başlat
 });
 
 function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
