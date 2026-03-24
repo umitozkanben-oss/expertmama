@@ -108,7 +108,7 @@ select{border:1px solid var(--border);border-radius:5px;background:var(--s2);col
 .tbl-body{overflow-y:auto;flex:1}
 
 /* Optimizer sağ kolon */
-.opt-col{width:510px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
+.opt-col{width:640px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;border-left:1px solid var(--border)}
 .opt-results-area{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:12px}
 .sec-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 
@@ -620,7 +620,7 @@ document.getElementById('btn-opt-all').addEventListener('click', async()=>{
       html+=`<table style="width:100%"><thead><tr>
         <th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th>
         <th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th>
-        <th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th></th>
+        <th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th>MaxZarar(pip)</th><th></th>
       </tr></thead><tbody>`;
       top5.forEach((r,i)=>{
         const id=`${sym}_${tf}_${r.f}_${r.s}_${r.mt}`;
@@ -631,6 +631,7 @@ document.getElementById('btn-opt-all').addEventListener('click', async()=>{
           <td class="${r.profit>=0?'pnl-p':'pnl-n'}">${r.profit>=0?'+':''}${f2(r.profit)}</td>
           <td>${r.pf===999?'∞':r.pf.toFixed(2)}</td>
           <td style="color:var(--sell)">-${f2(r.maxDD)}</td>
+          <td style="color:var(--sell)">${Math.round(r.maxLossPips)} pip</td>
           <td><button onclick="activateStrat('${id}','${sym}','${tf}',${r.f},${r.s},'${r.mt}')" style="padding:3px 10px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:11px;cursor:pointer;white-space:nowrap">Aktif Et</button></td>
         </tr>`;
       });
@@ -713,7 +714,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
   set('opt-count','('+results.length+')');
 
   // thead güncelle - MA türü sütunu ekle
-  document.querySelector('#opt-single thead tr').innerHTML=`<th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th><th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th><th>K/Z ($)</th><th>PF</th><th>MaxDD</th>`;
+  document.querySelector('#opt-single thead tr').innerHTML=`<th>Tür</th><th>Hızlı</th><th>Yavaş</th><th>W%</th><th style="color:var(--buy)">W</th><th style="color:var(--sell)">L</th><th>K/Z ($)</th><th>PF</th><th>MaxDD</th><th>MaxZarar(pip)</th>`;
 
   const tb=document.getElementById('opt-body');
   if(!results.length){
@@ -734,6 +735,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
       <td class="${r.profit>=0?'pnl-p':'pnl-n'}">${r.profit>=0?'+':''}${f2(r.profit)}</td>
       <td>${r.pf===999?'∞':r.pf.toFixed(2)}</td>
       <td style="color:var(--sell)">-${f2(r.maxDD)}</td>
+      <td style="color:var(--sell)">${Math.round(r.maxLossPips)} pip</td>
     </tr>`).join('');
   }
   btn.disabled=false;btn.textContent='⚡ Optimize Et';prog.style.display='none';
@@ -742,7 +744,7 @@ document.getElementById('btn-opt').addEventListener('click',async()=>{
 
 function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
   const mF=calcMA(closes,fP,mt),mS=calcMA(closes,sP,mt);
-  let trades=0,wins=0,losses=0,gW=0,gL=0,totalP=0,inT=false,dir=0,ep=0,equity=0,peak=0,maxDD=0;
+  let trades=0,wins=0,losses=0,gW=0,gL=0,totalP=0,inT=false,dir=0,ep=0,equity=0,peak=0,maxDD=0,maxLossPips=0;
   for(let i=sP+1;i<closes.length;i++){
     if(!mF[i]||!mS[i])continue;
     const cUp=mF[i]>mS[i]&&mF[i-1]<=mS[i-1],cDn=mF[i]<mS[i]&&mF[i-1]>=mS[i-1];
@@ -751,7 +753,7 @@ function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
       const pips=(closes[i]-ep)*dir/point;
       if(pips<=-slPts||pips>=tpPts||(cUp&&dir===-1)||(cDn&&dir===1)){
         const p=pips*pipVal;totalP+=p;equity+=p;
-        if(p>=0){wins++;gW+=p;}else{losses++;gL+=Math.abs(p);}
+        if(p>=0){wins++;gW+=p;}else{losses++;gL+=Math.abs(p);if(-pips>maxLossPips)maxLossPips=-pips;}
         trades++;
         if(equity>peak)peak=equity;
         const dd=peak-equity;if(dd>maxDD)maxDD=dd;
@@ -761,7 +763,7 @@ function bt(closes,fP,sP,mt,slPts,tpPts,point,pipVal){
     }
   }
   const pfv=gL>0?gW/gL:(gW>0?999:0);
-  return{trades,wins,losses,wr:trades>0?wins/trades*100:0,pf:pfv,profit:totalP,maxDD};
+  return{trades,wins,losses,wr:trades>0?wins/trades*100:0,pf:pfv,profit:totalP,maxDD,maxLossPips};
 }
 
 function set(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
