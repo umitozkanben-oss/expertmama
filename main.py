@@ -129,6 +129,7 @@ async def save_strategy(request: Request):
             "ma_type":  data.get("ma_type","EMA"),
             "lot":      float(data.get("lot",0.05)),
             "sl_pip":   float(data.get("sl_pip",0)),
+            "tp_pip":   float(data.get("tp_pip",0)),
             "atr_mult": float(data.get("atr_mult",1.5)),
             "active":   bool(data.get("active",True)),
             "created":  int(time.time()),
@@ -162,7 +163,12 @@ async def set_automode(request: Request):
     return {"status":"ok","auto_mode":auto_mode["enabled"]}
 
 # ── DATA ──
-@app.get("/data")
+@app.post("/clearhistory")
+def clear_history():
+    with lock:
+        trade_history.clear()
+        open_positions.clear()
+    return {"status":"ok"}
 def get_data():
     with lock:
         now = time.time()

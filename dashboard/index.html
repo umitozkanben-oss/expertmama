@@ -555,6 +555,7 @@ document.getElementById('opt-body').addEventListener('click',async e=>{
     body:JSON.stringify({id,symbol:activeSym,tf,fast:f,slow:s,ma_type:mt,
       lot:+document.getElementById('o-lot').value,
       sl_pip:+(document.getElementById('o-sl').value||0),
+      tp_pip:+(document.getElementById('o-tp').value||0),
       atr_mult:+document.getElementById('o-atr').value,active:true})
   });
   fetchAll();
@@ -647,6 +648,7 @@ async function activateStrat(id,sym,tf,fast,slow,mt){
     body:JSON.stringify({id,symbol:sym,tf,fast,slow,ma_type:mt,
       lot:+document.getElementById('o-lot').value,
       sl_pip:+(document.getElementById('o-sl').value||0),
+      tp_pip:+(document.getElementById('o-tp').value||0),
       atr_mult:+document.getElementById('o-atr').value,active:true})
   });
   fetchAll();
