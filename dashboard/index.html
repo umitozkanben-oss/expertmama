@@ -461,7 +461,8 @@ function filterHistory(hist){
     const d=new Date(t.time*1000);
     if(activeFilter==='today'){
       const midnight=new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0,0,0);
-      return d>=midnight;
+      const offset=1*60*60*1000; // broker 1 saat geri
+      return d>=new Date(midnight.getTime()-offset);
     }
     if(activeFilter==='week'){const w=new Date(now);w.setDate(now.getDate()-now.getDay());w.setHours(0,0,0,0);return d>=w;}
     if(activeFilter==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
