@@ -527,7 +527,7 @@ function renderStrategies(){
     <div class="strat-item ${s.active?'':'inactive'}">
       <div class="strat-info">
         <div class="strat-sym">${s.symbol} <span style="color:var(--muted);font-size:11px;font-weight:400">${s.tf}</span></div>
-        <div class="strat-detail">${s.ma_type}(${s.fast}/${s.slow}) · ${s.lot}L · ATR×${s.atr_mult}</div>
+        <div class="strat-detail">${s.ma_type}(${s.fast}/${s.slow}) · ${s.lot}L · SL:${s.sl_pip||0} TP:${s.tp_pip||0} · ATR×${s.atr_mult}</div>
       </div>
       <div class="strat-actions">
         <button class="sbtn tog" onclick="toggleStrat('${s.id}')">${s.active?'Dur':'Başlat'}</button>

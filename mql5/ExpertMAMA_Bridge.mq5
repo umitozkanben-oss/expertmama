@@ -2,9 +2,11 @@
 //|                                        ExpertMAMA_Bridge.mq5    |
 //|  VERİ KÖPRÜSÜ + OTOMATİK İŞLEM MOTORU                         |
 //+------------------------------------------------------------------+
-#property copyright "Copyright 2000-2026, MetaQuotes Ltd."
+#property copyright "Copyright 2000-2026 MetaQuotes Ltd."
 #property version   "3.00"
 #property description "MT5 ↔ VPS köprüsü + otomatik işlem motoru"
+
+ENUM_TIMEFRAMES StrToTF(string tf); // forward declaration
 
 #include <Trade\Trade.mqh>
 #include <Trade\PositionInfo.mqh>
@@ -13,8 +15,8 @@ CTrade         trade;
 CPositionInfo  posInfo;
 
 string VPS_URL      = "http://94.250.203.232:8765";
-input int    TickEvery   = 3;
-input int    PosEvery    = 10;
+input int    TickEvery   = 10;
+input int    PosEvery    = 30;
 input int    TrackMagic  = 0;
 input int    StratEvery  = 30;  // kaç tick'te bir strateji güncelle
 
@@ -42,6 +44,7 @@ struct Strategy {
    string ma_type;
    double lot;
    double sl_pip;
+   double tp_pip;
    double atr_mult;
    bool   active;
    int    handle_fast;  // MA handle — önceden açılır
@@ -250,12 +253,9 @@ void SendPositions()
 void FetchStrategies()
   {
    string resp=GetJSON("/strategies");
-   if(resp=="") { printf("FetchStrategies: boş response"); return; }
-   printf("FetchStrategies son 60: "+StringSubstr(resp,MathMax(0,StringLen(resp)-60)));
-
+   if(resp=="") return;
    // Basit JSON parser — "enabled": true/false
    g_auto_mode = (StringFind(resp,"\"auto_mode\":true")>=0 || StringFind(resp,"\"auto_mode\": true")>=0);
-   printf("auto_mode parse sonucu: "+IntegerToString(g_auto_mode));
 
    g_strat_count=0;
    int pos=0;
@@ -276,6 +276,7 @@ void FetchStrategies()
       s.slow     = (int)ExtractNum(obj,"\"slow\":");
       s.lot      = ExtractNum(obj,"\"lot\":");
       s.sl_pip   = ExtractNum(obj,"\"sl_pip\":");
+      s.tp_pip   = ExtractNum(obj,"\"tp_pip\":");
       s.atr_mult = ExtractNum(obj,"\"atr_mult\":");
       s.active   = (StringFind(obj,"\"active\":true")>=0);
 
@@ -289,6 +290,8 @@ void FetchStrategies()
          s.handle_slow = iMA(s.symbol,stf,s.slow,0,method,PRICE_CLOSE);
          s.handle_atr  = iATR(s.symbol,stf,14);
          g_strategies[g_strat_count]=s;
+         // İlk çalışmada yanlış işlem açmasın — mevcut bar zamanını kaydet
+         g_strat_last_bar[g_strat_count]=iTime(s.symbol,StrToTF(s.tf),0);
          g_strat_count++;
         }
       pos=end+1;
@@ -371,7 +374,13 @@ ENUM_TIMEFRAMES StrToTF(string tf)
 //+------------------------------------------------------------------+
 //| Strateji için magic number                                       |
 //+------------------------------------------------------------------+
-int StratMagic(int idx) { return 12100 + idx; }
+int StratMagic(string id)
+  {
+   int hash=12100;
+   for(int i=0;i<StringLen(id);i++)
+      hash=(hash*31+(int)StringGetCharacter(id,i))&0x7FFFFFFF;
+   return hash;
+  }
 
 //+------------------------------------------------------------------+
 //| Bu stratejiye ait açık pozisyon var mı?                         |
@@ -425,28 +434,7 @@ void UpdateTrailingSL(string sym, ulong ticket, int atr_handle, double atr_mult)
 //+------------------------------------------------------------------+
 void RunStrategies()
   {
-   static datetime last_log=0;
-   if(TimeCurrent()-last_log>=10)
-     {
-      printf("DEBUG auto="+IntegerToString(g_auto_mode)+" strat_count="+IntegerToString(g_strat_count));
-      last_log=TimeCurrent();
-     }
    if(!g_auto_mode || g_strat_count==0) return;
-   // Debug: ilk strateji handle kontrolü
-   if(g_strat_count>0)
-     {
-      double buf[2];
-      int n=CopyBuffer(g_strategies[0].handle_fast,0,0,2,buf);
-      static datetime last_log=0;
-      if(TimeCurrent()-last_log>=10) // 10 saniyede bir log
-        {
-         printf("DEBUG strat[0]="+g_strategies[0].id+
-                " handle="+IntegerToString(g_strategies[0].handle_fast)+
-                " CopyBuffer="+IntegerToString(n)+
-                " MA="+DoubleToString(n>0?buf[0]:0,5));
-         last_log=TimeCurrent();
-        }
-     }
    for(int i=0;i<g_strat_count;i++)
      {
       string sym     = g_strategies[i].symbol;
@@ -459,19 +447,18 @@ void RunStrategies()
       string strat_id= g_strategies[i].id;
 
       ENUM_TIMEFRAMES tf=StrToTF(tf_str);
-      int magic=StratMagic(i);
+      int magic=StratMagic(strat_id);
 
       // Trailing SL her tick güncelle
       long pos_type=0; ulong pos_ticket=0;
       bool has_pos=HasPosition(sym,magic,pos_type,pos_ticket);
       if(has_pos) UpdateTrailingSL(sym,pos_ticket,g_strategies[i].handle_atr,atr_mult);
 
-      // MA değerleri — handle'dan direkt oku
       double mF_buf[2], mS_buf[2];
       if(CopyBuffer(g_strategies[i].handle_fast,0,0,2,mF_buf)<=0) continue;
       if(CopyBuffer(g_strategies[i].handle_slow,0,0,2,mS_buf)<=0) continue;
-      double mF_cur=mF_buf[0], mF_prev=mF_buf[1];
-      double mS_cur=mS_buf[0], mS_prev=mS_buf[1];
+      double mF_cur=mF_buf[1], mF_prev=mF_buf[0];
+      double mS_cur=mS_buf[1], mS_prev=mS_buf[0];
 
       // Aynı barda tekrar açma (stop sonrası dahil)
       datetime cur_bar=iTime(sym,tf,0);
@@ -492,27 +479,31 @@ void RunStrategies()
       double atr_buf[1];
       double atr=0;
       if(CopyBuffer(g_strategies[i].handle_atr,0,1,1,atr_buf)>0) atr=atr_buf[0];
-      double sl_dist = (atr>0) ? atr*atr_mult : g_strategies[i].sl_pip*10*point;
+      double sl_dist  = (atr>0) ? atr*atr_mult : g_strategies[i].sl_pip*10*point;
+      double sl_pip   = g_strategies[i].sl_pip;
+      double tp_pip   = g_strategies[i].tp_pip;
 
       if(crossUp)
         {
          if(has_pos&&pos_type==POSITION_TYPE_SELL)
             trade.PositionClose(pos_ticket);
          double ask = SymbolInfoDouble(sym,SYMBOL_ASK);
-         double sl  = ask - sl_dist;
+         double sl  = sl_pip>0 ? ask - sl_pip*10*point : ask - sl_dist;
+         double tp  = tp_pip>0 ? ask + tp_pip*10*point : 0;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Buy(lot,sym,ask,sl,0,strat_id))
-            printf("BUY açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
+         if(trade.Buy(lot,sym,ask,sl,tp,strat_id))
+            printf("BUY açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5)+" TP="+DoubleToString(tp,5));
         }
       else if(crossDn)
         {
          if(has_pos&&pos_type==POSITION_TYPE_BUY)
             trade.PositionClose(pos_ticket);
          double bid = SymbolInfoDouble(sym,SYMBOL_BID);
-         double sl  = bid + sl_dist;
+         double sl  = sl_pip>0 ? bid + sl_pip*10*point : bid + sl_dist;
+         double tp  = tp_pip>0 ? bid - tp_pip*10*point : 0;
          trade.SetExpertMagicNumber(magic);
-         if(trade.Sell(lot,sym,bid,sl,0,strat_id))
-            printf("SELL açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5));
+         if(trade.Sell(lot,sym,bid,sl,tp,strat_id))
+            printf("SELL açıldı: "+sym+" "+strat_id+" SL="+DoubleToString(sl,5)+" TP="+DoubleToString(tp,5));
         }
      }
   }
