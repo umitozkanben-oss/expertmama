@@ -507,7 +507,7 @@ function renderHistory(hist){
   const filtered=filterHistory(hist).sort((a,b)=>b.time-a.time);
   if(!filtered.length){tb.innerHTML='<tr><td colspan="7" class="empty">İşlem yok</td></tr>';return;}
   tb.innerHTML=filtered.map(t=>{
-    const dt=new Date(t.time*1000+3600000).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const dt=new Date(t.time*1000).toLocaleString('tr-TR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     return`<tr>
       <td>${t.ticket}</td><td>${t.symbol}</td>
       <td><span class="badge b-${t.direction.toLowerCase()}">${t.direction}</span></td>
