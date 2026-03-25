@@ -103,6 +103,9 @@ async def recv_positions(request: Request):
         existing = {d.get("ticket") for d in trade_history}
         for deal in data.get("history",[]):
             if deal.get("ticket") not in existing:
+                # 25 Mart 2026 öncesi işlemleri alma
+                if deal.get("time",0) < 1742860800:
+                    continue
                 trade_history.appendleft(deal)
                 existing.add(deal.get("ticket"))
     return {"status":"ok"}
