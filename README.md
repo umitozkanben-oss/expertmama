@@ -86,7 +86,7 @@ Dashboard'da VPS URL girin: `http://VPS_IP:8765` ve Bağlan'a tıklayın.
 
 ## Özellikler
 
-- Tüm para pariteleri + XAUUSD, BTCUSD, US100
+- Tüm para pariteleri
 - SMA / EMA / WMA MA optimizasyonu
 - Brute-force backtest motoru (tüm fast/slow kombinasyonları)
 - MA bazlı / ATR bazlı / Sabit trailing SL görselleştirmesi
